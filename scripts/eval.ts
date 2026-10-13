@@ -7,7 +7,15 @@
  * Exits non-zero if any case fails.
  */
 import { toKnowledgeDocuments } from "@my-portfolio/content";
-import { GeminiEmbedder, InMemoryVectorStore, indexDocuments, LexicalEmbedder, runEval, type Embedder } from "@my-portfolio/rag";
+import {
+  DEFAULT_THRESHOLD,
+  GeminiEmbedder,
+  InMemoryVectorStore,
+  indexDocuments,
+  LexicalEmbedder,
+  runEval,
+  type Embedder,
+} from "@my-portfolio/rag";
 
 const useGemini = process.argv.includes("--gemini");
 
@@ -20,7 +28,7 @@ if (useGemini) {
     process.exit(1);
   }
   embedder = new GeminiEmbedder({ apiKey, model: process.env.GEMINI_EMBEDDING_MODEL || undefined, dimensions: Number(process.env.EMBEDDING_DIMENSIONS ?? 768) });
-  threshold = Number(process.env.RETRIEVAL_THRESHOLD ?? 0.55);
+  threshold = Number(process.env.RETRIEVAL_THRESHOLD ?? DEFAULT_THRESHOLD);
 } else {
   embedder = new LexicalEmbedder();
   threshold = Number(process.env.RETRIEVAL_THRESHOLD ?? 0.2);

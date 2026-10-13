@@ -17,7 +17,12 @@ export type Retrieval = {
 };
 
 export const DEFAULT_TOP_K = 4;
-export const DEFAULT_THRESHOLD = 0.55;
+/**
+ * With Gemini embeddings, off-topic questions scored about 0.52 and the weakest genuine
+ * answer about 0.68, so 0.60 sits in the gap. Re-check with `npm run eval -- --gemini`
+ * after changing the content or the embedding model.
+ */
+export const DEFAULT_THRESHOLD = 0.6;
 
 export async function retrieve(
   question: string,

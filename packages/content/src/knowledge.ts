@@ -20,7 +20,7 @@ export function toKnowledgeDocuments(): KnowledgeDocument[] {
     title: "Profile",
     text: `${profile.name}. ${profile.headline}. Based in ${profile.location}. ${profile.summary} Open to relocation: ${
       profile.availability.relocation ? "yes" : "no"
-    }. Open to visa sponsorship: ${profile.availability.visaSponsorship ? "yes" : "no"}.`,
+    }. Open to visa sponsorship: ${profile.availability.visaSponsorship ? "yes" : "no"}. Contact: email ${profile.email}, LinkedIn ${profile.linkedin}, GitHub ${profile.github}.`,
   });
 
   for (const e of experience) {
