@@ -1,0 +1,59 @@
+import assert from "node:assert/strict";
+import { test } from "node:test";
+import { ConfigError, loadConfig } from "./config";
+
+const base = {
+  GEMINI_API_KEY: "k1",
+  GEMINI_CHAT_MODEL: "some-model",
+  PINECONE_API_KEY: "k2",
+  PINECONE_INDEX: "portfolio",
+};
+
+test("local mode needs only the four core settings and allows a missing Origin", () => {
+  const c = loadConfig(base, { production: false });
+  assert.equal(c.threshold, 0.6);
+  assert.equal(c.perMinute, 10);
+  assert.equal(c.allowMissingOrigin, true);
+  assert.equal(c.upstash, undefined);
+});
+
+test("reports every missing setting at once, by name only", () => {
+  try {
+    loadConfig({}, { production: false });
+    assert.fail("should throw");
+  } catch (e) {
+    assert.ok(e instanceof ConfigError);
+    for (const name of ["GEMINI_API_KEY", "GEMINI_CHAT_MODEL", "PINECONE_API_KEY", "PINECONE_INDEX"]) {
+      assert.match(e.message, new RegExp(name));
+    }
+  }
+});
+
+test("production also requires allowed origins and Upstash credentials, and forbids a missing Origin", () => {
+  assert.throws(() => loadConfig(base, { production: true }), /ALLOWED_ORIGINS[\s\S]*UPSTASH_REDIS_REST_URL[\s\S]*UPSTASH_REDIS_REST_TOKEN/);
+  const c = loadConfig(
+    { ...base, ALLOWED_ORIGINS: "https://a.example/, https://b.example", UPSTASH_REDIS_REST_URL: "https://u", UPSTASH_REDIS_REST_TOKEN: "t" },
+    { production: true }
+  );
+  assert.deepEqual(c.allowedOrigins, ["https://a.example", "https://b.example"]);
+  assert.equal(c.allowMissingOrigin, false);
+  assert.ok(c.upstash);
+});
+
+test("rejects a half-configured Upstash and bad numbers", () => {
+  assert.throws(() => loadConfig({ ...base, UPSTASH_REDIS_REST_URL: "https://u" }, { production: false }), /both UPSTASH/);
+  assert.throws(() => loadConfig({ ...base, RATE_LIMIT_PER_MINUTE: "0" }, { production: false }), /RATE_LIMIT_PER_MINUTE/);
+  assert.throws(() => loadConfig({ ...base, RETRIEVAL_THRESHOLD: "1.5" }, { production: false }), /RETRIEVAL_THRESHOLD/);
+});
+
+test("rejects a Pinecone host URL as the index name", () => {
+  assert.throws(() => loadConfig({ ...base, PINECONE_INDEX: "https://x.svc.pinecone.io" }, { production: false }), /index name/);
+});
+
+test("error messages never contain secret values", () => {
+  try {
+    loadConfig({ ...base, GEMINI_API_KEY: "SECRET-VALUE-123", RATE_LIMIT_PER_MINUTE: "abc" }, { production: false });
+  } catch (e) {
+    assert.doesNotMatch((e as Error).message, /SECRET-VALUE-123/);
+  }
+});
