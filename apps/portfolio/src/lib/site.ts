@@ -3,6 +3,12 @@ import { caseStudies, type CaseStudy } from "@my-portfolio/content";
 export const RESUME_URL = "/Chandra_Moorthy_Resume.pdf";
 export const HAS_RESUME = __HAS_RESUME__;
 
+/**
+ * The chat widget is always on in development. In production it stays hidden until the API is
+ * deployed and VITE_CHAT_ENABLED=true is set, so visitors never see a button that cannot work.
+ */
+export const CHAT_ENABLED = import.meta.env.DEV || import.meta.env.VITE_CHAT_ENABLED === "true";
+
 /** Drafts are shown only while developing, so unapproved wording can never reach production. */
 const SHOW_DRAFTS = import.meta.env.DEV;
 
