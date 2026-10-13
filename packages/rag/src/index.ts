@@ -17,5 +17,7 @@ export { retrieve, DEFAULT_THRESHOLD, DEFAULT_TOP_K, type Retrieval, type Retrie
 export { buildPrompt, sourcesOf, SYSTEM_PROMPT, type BuiltPrompt, type Turn } from "./prompt";
 export { indexDocuments } from "./ingest";
 export { runEval, EVAL_CASES, type EvalCase, type EvalReport } from "./eval";
+export type { Generator } from "./generator";
 export { GeminiEmbedder, DEFAULT_EMBEDDING_MODEL, type GeminiEmbedderOptions } from "./adapters/gemini";
+export { GeminiGenerator, type GeminiGeneratorOptions } from "./adapters/geminiGenerator";
 export { PineconeStore, type PineconeStoreOptions } from "./adapters/pinecone";
