@@ -139,8 +139,8 @@ Read once at start-up by `loadConfig`. Names only here; values live in `.env` lo
 | Variable | Required | Purpose |
 | --- | --- | --- |
 | `GEMINI_API_KEY` | yes | Embeddings and answers |
-| `GEMINI_CHAT_MODEL` | yes | Model used for answers. Deliberately has no default, because names and availability change. Measured on the free tier: `gemini-3.1-flash-lite` answers in about 7 to 12 s. |
-| `GEMINI_CHAT_FALLBACK_MODELS` | no | Comma-separated models tried in order if the primary is slow, overloaded (503), rate-limited or unavailable (404). Never used after text has started streaming. |
+| `GEMINI_CHAT_MODEL` | no | Model used for answers. Default `gemini-3.1-flash-lite`, measured at about 7 to 12 s to first word on the free tier. Names and availability change, so re-measure before changing. |
+| `GEMINI_CHAT_FALLBACK_MODELS` | no | Default `gemini-3.1-flash-lite-preview`. Comma-separated models tried in order if the primary is slow, overloaded (503), rate-limited or unavailable (404). Never used after text has started streaming. |
 | `GEMINI_FIRST_TOKEN_TIMEOUT_MS` | no | Give up on a model if it has produced no text by then. Default 15000 |
 | `PINECONE_INDEX_HOST` | no | Index host from the console. Skips a lookup that cost about 3 s on a cold start |
 | `FAQ_FAST_PATH_THRESHOLD` | no | Similarity at which a match on an approved FAQ is answered instantly from its stored text. Default 0.80 |
