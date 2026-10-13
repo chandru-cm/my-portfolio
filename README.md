@@ -191,6 +191,7 @@ npm run preview
 npm test                       # unit tests, offline
 npm run eval                   # offline guardrail and pipeline check, no keys
 npm run eval -- --gemini       # real recall check (needs GEMINI_API_KEY in .env)
+npm run check:pinecone         # verify index name, dimension, metric and record counts
 npm run ingest -- --dry-run    # show what would be indexed
 npm run ingest                 # embed and upsert to Pinecone (idempotent)
 npm run ingest -- --reset      # wipe the namespace, then re-index

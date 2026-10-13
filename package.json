@@ -13,7 +13,8 @@
     "typecheck": "npm run typecheck --workspaces --if-present && tsc --noEmit -p scripts",
     "test": "node --import tsx --test \"packages/**/*.test.ts\"",
     "eval": "node --env-file-if-exists=.env --import tsx scripts/eval.ts",
-    "ingest": "node --env-file-if-exists=.env --import tsx scripts/ingest.ts"
+    "ingest": "node --env-file-if-exists=.env --import tsx scripts/ingest.ts",
+    "check:pinecone": "node --env-file-if-exists=.env --import tsx scripts/check-pinecone.ts"
   },
   "engines": {
     "node": ">=22"
