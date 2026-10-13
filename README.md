@@ -191,7 +191,15 @@ npm run preview
 
 ### Chat in development
 
-`npm run dev` starts the website and a local copy of the chat API. The website proxies `/api` to it, so the **Ask about Chandra Moorthy** button works at http://localhost:5173.
+`npm run dev` starts the website (http://localhost:5173) and a local copy of the chat API (http://localhost:8787). By default the website calls the relative address `/api/chat` and the Vite dev server proxies it to the API.
+
+To point the website at an explicit server instead, set `VITE_API_BASE_URL` in the root `.env`:
+
+```
+VITE_API_BASE_URL=http://localhost:8787
+```
+
+The website then calls `http://localhost:8787/api/chat` directly, with no proxy involved. The same setting can point at a deployed API. If the chat shows "Couldn't reach the assistant", the message in development names the URL it tried. Check that the API is running with `curl http://localhost:8787/api/health`.
 
 - **Live mode** (real Gemini and Pinecone) starts when `.env` has `GEMINI_API_KEY`, `PINECONE_API_KEY` and `PINECONE_INDEX`. The terminal prints `Chat API (LIVE)`.
 - **Offline mode** starts automatically if those are missing or invalid, so the interface can still be developed. It prints the reason, then `Chat API (OFFLINE)`. Answers echo matched context instead of calling a model. Force it with `DEV_API_MODE=offline`.

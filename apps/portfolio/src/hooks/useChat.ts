@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { profile } from "@my-portfolio/content";
+import { CHAT_ENDPOINT } from "../lib/site";
 import { SseParser } from "../lib/sse";
 
 export const MAX_QUESTIONS = 5;
@@ -32,7 +33,7 @@ async function describeFailure(res: Response): Promise<string> {
 }
 
 /** Chat state and streaming. Conversation lives in memory only: nothing is saved by the page. */
-export function useChat(endpoint = "/api/chat") {
+export function useChat(endpoint = CHAT_ENDPOINT) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [status, setStatus] = useState<ChatStatus>("idle");
   const [asked, setAsked] = useState(0);
@@ -133,7 +134,10 @@ export function useChat(endpoint = "/api/chat") {
         setBusy("idle");
       } catch (error) {
         if ((error as { name?: string }).name === "AbortError") return null;
-        fail("Couldn't reach the assistant. Check your connection and try again.");
+        // Development only: say which URL failed, since a wrong or stopped server is the usual cause.
+        if (import.meta.env.DEV) console.error(`Chat request to ${endpoint} failed`, error);
+        const hint = import.meta.env.DEV ? ` (tried ${endpoint}. Is the chat API running? npm run dev starts it.)` : "";
+        fail(`Couldn't reach the assistant. Check your connection and try again.${hint}`);
       }
       return null;
     },
