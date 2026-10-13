@@ -9,10 +9,11 @@
  * offline uses the real knowledge base with a keyword matcher and echoes context instead of
  * calling a model.
  */
-import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
+import { createServer } from "node:http";
 import { handleChat, type ChatDeps } from "./src/chat";
 import { ConfigError, loadConfig } from "./src/config";
 import { createDeps } from "./src/deps";
+import { toNodeHandler } from "./src/node";
 import { EchoGenerator, makeDeps } from "./src/testkit";
 
 const PORT = Number(process.env.API_PORT ?? 8787);
@@ -39,45 +40,17 @@ async function buildDeps(): Promise<{ deps: ChatDeps; mode: "live" | "offline" }
 
 const { deps, mode } = await buildDeps();
 
-async function readBody(req: IncomingMessage): Promise<Buffer> {
-  const chunks: Buffer[] = [];
-  for await (const chunk of req) chunks.push(chunk as Buffer);
-  return Buffer.concat(chunks);
-}
+const chatRoute = toNodeHandler((request) => handleChat(request, deps));
 
-function send(res: ServerResponse, status: number, body: string, type = "application/json") {
-  res.writeHead(status, { "Content-Type": type });
-  res.end(body);
-}
-
-createServer(async (req, res) => {
-  const url = new URL(req.url ?? "/", `http://${req.headers.host ?? "localhost"}`);
-
-  if (url.pathname === "/api/health") return send(res, 200, JSON.stringify({ ok: true, mode }));
-  if (url.pathname !== "/api/chat") return send(res, 404, JSON.stringify({ error: { code: "not_found" } }));
-
-  const headers = new Headers();
-  for (const [k, v] of Object.entries(req.headers)) if (v !== undefined) headers.set(k, Array.isArray(v) ? v.join(", ") : v);
-
-  const hasBody = req.method !== "GET" && req.method !== "HEAD";
-  const request = new Request(url, { method: req.method, headers, body: hasBody ? new Uint8Array(await readBody(req)) : undefined });
-  const response = await handleChat(request, deps);
-
-  res.writeHead(response.status, Object.fromEntries(response.headers));
-  if (!response.body) return res.end();
-
-  const reader = response.body.getReader();
-  res.on("close", () => void reader.cancel().catch(() => {}));
-  try {
-    for (;;) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      res.write(value);
-    }
-  } catch {
-    /* client went away */
-  }
-  res.end();
+createServer((req, res) => {
+  const { pathname } = new URL(req.url ?? "/", `http://${req.headers.host ?? "localhost"}`);
+  if (pathname === "/api/chat") return void chatRoute(req, res);
+  const json = (status: number, body: unknown) => {
+    res.writeHead(status, { "Content-Type": "application/json" });
+    res.end(JSON.stringify(body));
+  };
+  if (pathname === "/api/health") return json(200, { ok: true, mode });
+  return json(404, { error: { code: "not_found" } });
 }).listen(PORT, "127.0.0.1", () => {
   console.log(`\nChat API (${mode.toUpperCase()}) listening on http://127.0.0.1:${PORT}/api/chat`);
   if (mode === "offline") console.log("Offline: answers echo matched context. Add keys to .env for real answers.\n");
