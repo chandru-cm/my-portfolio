@@ -74,3 +74,11 @@ test("system prompt avoids the bare first name and gendered pronouns", () => {
 test("sources are de-duplicated in match order", () => {
   assert.deepEqual(sourcesOf([match("A", "1"), match("B", "2"), match("A", "3")]), ["A", "B"]);
 });
+
+test("sources are limited to the best matches within a score window", () => {
+  const at = (title: string, score: number) => ({ ...match(title, "t"), score });
+  const ctx = [at("A", 0.9), at("B", 0.85), at("C", 0.7), at("D", 0.69)];
+  assert.deepEqual(sourcesOf(ctx), ["A", "B"]);
+  assert.deepEqual(sourcesOf([at("A", 0.9), at("B", 0.89), at("C", 0.88), at("D", 0.87)]), ["A", "B", "C"]);
+  assert.deepEqual(sourcesOf([]), []);
+});

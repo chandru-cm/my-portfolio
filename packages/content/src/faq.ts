@@ -1,3 +1,4 @@
+import { profile } from "./profile";
 import type { Faq } from "./types";
 
 // Answers use only facts from the resume. Salary and private details are deliberately absent.
@@ -19,6 +20,11 @@ export const faq: Faq[] = [
     question: "What AI experience does Chandra Moorthy have?",
     answer:
       "Chandra Moorthy integrated Google Vertex AI and Gemini for generative content and context-aware features, using Pinecone vector search and WebSocket-based response streaming. Generative AI features appear in RentEasify and DigiVCards.ai.",
+  },
+  {
+    id: "faq-contact",
+    question: "How can I contact Chandra Moorthy?",
+    answer: `Email Chandra Moorthy at ${profile.email}, or connect on LinkedIn (${profile.linkedin}) or GitHub (${profile.github}).`,
   },
   {
     id: "faq-roles",

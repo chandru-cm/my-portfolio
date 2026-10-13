@@ -213,3 +213,35 @@ test("logs carry status, kind and latency but never the question text", async ()
   assert.deepEqual(Object.keys(events[0]).sort(), ["kind", "ms", "reason", "status"]);
   assert.doesNotMatch(JSON.stringify(events), /relocation/);
 });
+
+// ---- Instant FAQ path ----------------------------------------------------------------------
+
+test("a close FAQ match is answered instantly from the approved text, without the model", async () => {
+  const generator = new ScriptedGenerator();
+  const deps = await makeDeps({ generator });
+  deps.config.faqFastPathThreshold = 0.5;
+  const res = await handleChat(post(ASK), deps);
+  const events = await readSse(res);
+  assert.equal(events[0].data.kind, "answer");
+  assert.deepEqual(events[0].data.sources, ["Is Chandra Moorthy open to relocation or visa sponsorship?"]);
+  assert.match(tokensOf(events), /^Yes\. Chandra Moorthy is open to relocation and to visa sponsorship/);
+  assert.doesNotMatch(tokensOf(events), /^Is Chandra Moorthy open/);
+  assert.equal(events.at(-1)?.event, "done");
+  assert.equal(generator.calls, 0);
+});
+
+test("non-FAQ questions still use the model even when the fast path is on", async () => {
+  const generator = new ScriptedGenerator(["From the model."]);
+  const deps = await makeDeps({ generator });
+  deps.config.faqFastPathThreshold = 0.5;
+  const events = await readSse(await handleChat(post({ message: "Describe RentEasify rent billing lease agreements and payment collection" }), deps));
+  assert.equal(tokensOf(events), "From the model.");
+  assert.equal(generator.calls, 1);
+});
+
+test("the fast path can be disabled by setting the threshold above any possible score", async () => {
+  const generator = new ScriptedGenerator(["From the model."]);
+  const events = await readSse(await handleChat(post(ASK), await makeDeps({ generator })));
+  assert.equal(tokensOf(events), "From the model.");
+  assert.equal(generator.calls, 1);
+});

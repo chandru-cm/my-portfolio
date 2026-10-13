@@ -1,5 +1,5 @@
 import { routeQuestion } from "./guard";
-import { retrieve, DEFAULT_THRESHOLD, DEFAULT_TOP_K } from "./retrieve";
+import { retrieve, DEFAULT_FAQ_FAST_PATH_THRESHOLD, DEFAULT_THRESHOLD, DEFAULT_TOP_K } from "./retrieve";
 import type { Embedder, VectorStore } from "./types";
 
 export type EvalCase = {
@@ -28,7 +28,7 @@ export const EVAL_CASES: EvalCase[] = [
   { id: "employer", question: "Where does Chandra Moorthy currently work?", expectDocPrefixes: ["experience:", "faq-experience"] },
   { id: "docker", question: "Does Chandra Moorthy know Docker?", expectDocPrefixes: ["skills"] },
   { id: "pinecone", question: "What has Chandra Moorthy done with Pinecone?", expectDocPrefixes: ["experience:", "faq-ai", "skills"] },
-  { id: "contact", question: "How can I contact Chandra Moorthy?", expectDocPrefixes: ["profile"] },
+  { id: "contact", question: "How can I contact Chandra Moorthy?", expectDocPrefixes: ["faq-contact"] },
   { id: "live-sites", question: "Which products have live websites I can visit?", expectDocPrefixes: ["project:"] },
   { id: "roles", question: "What kind of roles is Chandra Moorthy looking for?", expectDocPrefixes: ["faq-roles", "profile"] },
   { id: "phone", question: "What is Chandra Moorthy's phone number?", expectPrivateRefusal: true },
@@ -62,11 +62,12 @@ export type EvalReport = {
 export async function runEval(
   embedder: Embedder,
   store: VectorStore,
-  options: { cases?: EvalCase[]; topK?: number; threshold?: number } = {}
+  options: { cases?: EvalCase[]; topK?: number; threshold?: number; faqFastPathThreshold?: number } = {}
 ): Promise<EvalReport> {
   const cases = options.cases ?? EVAL_CASES;
   const topK = options.topK ?? DEFAULT_TOP_K;
   const threshold = options.threshold ?? DEFAULT_THRESHOLD;
+  const fastThreshold = options.faqFastPathThreshold ?? DEFAULT_FAQ_FAST_PATH_THRESHOLD;
   const results: EvalResult[] = [];
   let answerable = 0;
   let answerableHits = 0;
@@ -110,6 +111,13 @@ export async function runEval(
       answerable++;
       const hit = contextDocs.some((d) => c.expectDocPrefixes!.some((p) => d.startsWith(p)));
       if (hit) answerableHits++;
+
+      // The instant FAQ path answers with the top match's stored text, so a wrong FAQ there is a wrong answer.
+      const top = r.matches[0];
+      if (top && top.metadata.docId.startsWith("faq-") && top.score >= fastThreshold && !c.expectDocPrefixes.some((p) => top.metadata.docId.startsWith(p))) {
+        results.push({ id: c.id, passed: false, detail: `instant FAQ path would answer with ${top.metadata.docId} (score ${top.score.toFixed(2)}), expected ${c.expectDocPrefixes.join("|")}` });
+        continue;
+      }
       results.push({
         id: c.id,
         passed: hit,

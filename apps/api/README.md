@@ -59,7 +59,7 @@ data: {}
 
 | `kind` | Meaning | AI model called? |
 | --- | --- | --- |
-| `answer` | Answered from retrieved context | Yes |
+| `answer` | Answered from retrieved context, or instantly from a closely matching approved FAQ | Usually; not for FAQ matches |
 | `unknown` | Nothing in the knowledge base cleared the similarity threshold | No |
 | `refusal` | A private-details request (phone, salary, address, ...) | No |
 
@@ -139,7 +139,11 @@ Read once at start-up by `loadConfig`. Names only here; values live in `.env` lo
 | Variable | Required | Purpose |
 | --- | --- | --- |
 | `GEMINI_API_KEY` | yes | Embeddings and answers |
-| `GEMINI_CHAT_MODEL` | yes | Model used for answers. Copy the current free Flash model name from Google AI Studio. Deliberately has no default, because model names change. |
+| `GEMINI_CHAT_MODEL` | yes | Model used for answers. Deliberately has no default, because names and availability change. Measured on the free tier: `gemini-3.1-flash-lite` answers in about 7 to 12 s. |
+| `GEMINI_CHAT_FALLBACK_MODELS` | no | Comma-separated models tried in order if the primary is slow, overloaded (503), rate-limited or unavailable (404). Never used after text has started streaming. |
+| `GEMINI_FIRST_TOKEN_TIMEOUT_MS` | no | Give up on a model if it has produced no text by then. Default 15000 |
+| `PINECONE_INDEX_HOST` | no | Index host from the console. Skips a lookup that cost about 3 s on a cold start |
+| `FAQ_FAST_PATH_THRESHOLD` | no | Similarity at which a match on an approved FAQ is answered instantly from its stored text. Default 0.80 |
 | `GEMINI_EMBEDDING_MODEL` | no | Defaults to `gemini-embedding-001` |
 | `EMBEDDING_DIMENSIONS` | no | Must equal the index dimension. Default 768 |
 | `PINECONE_API_KEY`, `PINECONE_INDEX` | yes | Vector search. `PINECONE_INDEX` is the index name, not its URL |
@@ -147,6 +151,7 @@ Read once at start-up by `loadConfig`. Names only here; values live in `.env` lo
 | `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` | production | Shared rate-limit counters |
 | `ALLOWED_ORIGINS` | production | Comma-separated site origins, for example `https://your-site.vercel.app` |
 | `RETRIEVAL_THRESHOLD` | no | Default 0.60. Tune with `npm run eval -- --gemini` |
+| `RETRIEVAL_TOP_K` | no | Chunks retrieved. Default 6 |
 | `RATE_LIMIT_PER_MINUTE` | no | Per visitor. Default 10 |
 | `RATE_LIMIT_PER_DAY` | no | Per visitor. Default 40 |
 | `GLOBAL_DAILY_LIMIT` | no | All visitors combined, protects the free quota. Default 500 |
@@ -247,3 +252,22 @@ Open items to verify at deployment time, because they cannot be proven locally:
 | Every answer is `kind: unknown` | Index is empty or in another namespace. Run `npm run check:pinecone`, then `npm run ingest -- --reset` |
 | Startup error naming a variable | A required setting is missing. Check `.env` or Vercel settings |
 | `502 upstream_error` | Gemini or Pinecone rejected the call: wrong key, wrong model name, or free quota used up |
+
+---
+
+## 10. Measured performance (free tier, live)
+
+| Path | Typical time |
+| --- | --- |
+| Private-details refusal | a few milliseconds |
+| Off-topic ("I don't know") | about 3.5 s (embedding plus vector search) |
+| Instant FAQ answer | about 4 s |
+| Model-written answer | about 13 to 15 s, almost all of it waiting for the first word from Gemini |
+
+Findings that shaped the design:
+
+- The first live version took 104 to 148 s per answer. Embedding took 0.7 s and Pinecone 3.5 s; the rest was Gemini's first word on an overloaded free tier.
+- Model speed varies a lot between names and between calls. Five timed calls each: `gemini-3.1-flash-lite` 1.7 to 12.5 s (one 503), `gemini-3.1-flash-lite-preview` 7 to 15 s, `gemini-3.5-flash-lite` over 30 s every time. Measure before choosing a model.
+- So the backend has a first-word deadline, falls back to another model, and answers common questions from approved FAQ text without any model call.
+- The instant path is checked by `npm run eval -- --gemini`. At 0.80 and 0.85 it never answered with the wrong FAQ; at 0.76 it did.
+- A paid Gemini tier would probably be faster, but that has not been measured.

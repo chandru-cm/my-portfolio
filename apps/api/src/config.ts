@@ -1,3 +1,5 @@
+import { DEFAULT_FAQ_FAST_PATH_THRESHOLD, DEFAULT_TOP_K } from "@my-portfolio/rag";
+
 export type Env = Record<string, string | undefined>;
 
 /** The subset of settings the request handler itself needs. */
@@ -9,15 +11,20 @@ export type HandlerConfig = {
   threshold: number;
   topK: number;
   maxBodyBytes: number;
+  /** A match on an approved FAQ at or above this score is answered instantly, without the model. */
+  faqFastPathThreshold: number;
 };
 
 export type Config = HandlerConfig & {
   geminiApiKey: string;
   geminiChatModel: string;
+  geminiFallbackModels: string[];
+  firstTokenTimeoutMs: number;
   geminiEmbeddingModel?: string;
   dimensions: number;
   pineconeApiKey: string;
   pineconeIndex: string;
+  pineconeIndexHost?: string;
   pineconeNamespace: string;
   upstash?: { url: string; token: string };
   perMinute: number;
@@ -91,18 +98,29 @@ export function loadConfig(env: Env, options: { production?: boolean } = {}): Co
     else threshold = t;
   }
 
+  let faqFastPathThreshold = DEFAULT_FAQ_FAST_PATH_THRESHOLD;
+  if (env.FAQ_FAST_PATH_THRESHOLD) {
+    const t = Number(env.FAQ_FAST_PATH_THRESHOLD);
+    if (!(t > 0 && t <= 1)) problems.push(`FAQ_FAST_PATH_THRESHOLD must be between 0 and 1 (got "${env.FAQ_FAST_PATH_THRESHOLD}")`);
+    else faqFastPathThreshold = t;
+  }
+
   const config: Config = {
     allowedOrigins,
     allowMissingOrigin: !production,
     threshold,
-    topK: int(env, "RETRIEVAL_TOP_K", 4, problems),
+    topK: int(env, "RETRIEVAL_TOP_K", DEFAULT_TOP_K, problems),
     maxBodyBytes: 4096,
+    faqFastPathThreshold,
     geminiApiKey,
     geminiChatModel,
+    geminiFallbackModels: (env.GEMINI_CHAT_FALLBACK_MODELS ?? "").split(",").map((m) => m.trim()).filter(Boolean),
+    firstTokenTimeoutMs: int(env, "GEMINI_FIRST_TOKEN_TIMEOUT_MS", 15000, problems),
     geminiEmbeddingModel: env.GEMINI_EMBEDDING_MODEL || undefined,
     dimensions: int(env, "EMBEDDING_DIMENSIONS", 768, problems),
     pineconeApiKey,
     pineconeIndex,
+    pineconeIndexHost: env.PINECONE_INDEX_HOST?.trim() || undefined,
     pineconeNamespace: env.PINECONE_NAMESPACE || "portfolio",
     upstash: upstashUrl && upstashToken ? { url: upstashUrl, token: upstashToken } : undefined,
     perMinute: int(env, "RATE_LIMIT_PER_MINUTE", 10, problems),

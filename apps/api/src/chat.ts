@@ -140,12 +140,12 @@ async function run(
     }
   }
 
-  const fixed = (kind: "refusal" | "unknown", answer: string) =>
+  const fixed = (kind: "refusal" | "unknown" | "answer", answer: string, sources: string[] = [], logKind: string = kind) =>
     finish(
       sseResponse(
         new ReadableStream<Uint8Array>({
           start(controller) {
-            controller.enqueue(sseEvent("meta", { kind, sources: [] }));
+            controller.enqueue(sseEvent("meta", { kind, sources }));
             controller.enqueue(sseEvent("token", { text: answer }));
             controller.enqueue(sseEvent("done", {}));
             controller.close();
@@ -153,7 +153,7 @@ async function run(
         }),
         cors
       ),
-      kind
+      logKind
     );
 
   if (routeQuestion(question).kind === "refuse-private") return fixed("refusal", PRIVATE_REFUSAL);
@@ -168,6 +168,15 @@ async function run(
     return finish(jsonError(502, "upstream_error", "The assistant is unavailable right now.", cors), undefined, "retrieve");
   }
   if (!retrieval.answerable) return fixed("unknown", UNKNOWN_ANSWER);
+
+  // Instant path: a close match to an approved FAQ is answered with its stored text. No model
+  // call, so no wait and no quota used. The text is the owner-approved answer, never generated.
+  const top = retrieval.matches[0];
+  if (top && top.metadata.docId.startsWith("faq-") && top.score >= config.faqFastPathThreshold) {
+    const { title, text } = top.metadata;
+    const answer = text.startsWith(title) ? text.slice(title.length).trim() : text;
+    return fixed("answer", answer, [title], "faq");
+  }
 
   const prompt = buildPrompt({ question, history, context: retrieval.context });
   const sources = sourcesOf(retrieval.context);
