@@ -1,4 +1,5 @@
 import { caseStudies, type CaseStudy } from "@my-portfolio/content";
+import { joinUrl } from "./url";
 
 export const RESUME_URL = "/Chandra_Moorthy_Resume.pdf";
 export const HAS_RESUME = __HAS_RESUME__;
@@ -7,6 +8,13 @@ export const HAS_RESUME = __HAS_RESUME__;
  * The chat widget is always on in development. In production it stays hidden until the API is
  * deployed and VITE_CHAT_ENABLED=true is set, so visitors never see a button that cannot work.
  */
+/**
+ * Where the chat API lives. Empty means same origin: the dev proxy or the production rewrite
+ * handles /api. Set VITE_API_BASE_URL (for example http://localhost:8787) to call a server directly.
+ */
+export const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL ?? "").trim();
+export const CHAT_ENDPOINT = joinUrl(API_BASE_URL, "/api/chat");
+
 export const CHAT_ENABLED = import.meta.env.DEV || import.meta.env.VITE_CHAT_ENABLED === "true";
 
 /** Drafts are shown only while developing, so unapproved wording can never reach production. */

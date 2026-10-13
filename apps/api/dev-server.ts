@@ -16,7 +16,9 @@ import { createDeps } from "./src/deps";
 import { EchoGenerator, makeDeps } from "./src/testkit";
 
 const PORT = Number(process.env.API_PORT ?? 8787);
-const DEV_ORIGINS = ["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:4173", "http://127.0.0.1:4173"];
+// Vite moves to the next free port when 5173 is taken, so allow a small range of local ports.
+const DEV_PORTS = [5173, 5174, 5175, 5176, 5177, 5178, 4173, 4174, 4175];
+const DEV_ORIGINS = DEV_PORTS.flatMap((p) => [`http://localhost:${p}`, `http://127.0.0.1:${p}`]);
 
 async function buildDeps(): Promise<{ deps: ChatDeps; mode: "live" | "offline" }> {
   if (process.env.DEV_API_MODE !== "offline") {

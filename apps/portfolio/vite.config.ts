@@ -11,6 +11,9 @@ const root = dirname(fileURLToPath(import.meta.url));
 const hasResume = existsSync(resolve(root, "public/Chandra_Moorthy_Resume.pdf"));
 
 export default defineConfig({
+  // Read VITE_* settings from the repository root .env, so one file configures everything.
+  // Only variables prefixed VITE_ reach the browser; the API keys in that file never do.
+  envDir: resolve(root, "../.."),
   plugins: [react()],
   server: {
     // In development, /api goes to the local chat API (apps/api dev server).

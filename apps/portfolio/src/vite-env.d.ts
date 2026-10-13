@@ -6,4 +6,6 @@ declare const __HAS_RESUME__: boolean;
 interface ImportMetaEnv {
   /** Set to "true" in Vercel once the chat API is deployed and /api is routed to it. */
   readonly VITE_CHAT_ENABLED?: string;
+  /** Base URL of the chat API, for example http://localhost:8787. Empty uses the same origin. */
+  readonly VITE_API_BASE_URL?: string;
 }
