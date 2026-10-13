@@ -36,9 +36,10 @@ if (useGemini) {
 
 const store = new InMemoryVectorStore();
 await indexDocuments(toKnowledgeDocuments(), embedder, store);
-const report = await runEval(embedder, store, { threshold });
+const faqFastPathThreshold = process.env.FAQ_FAST_PATH_THRESHOLD ? Number(process.env.FAQ_FAST_PATH_THRESHOLD) : undefined;
+const report = await runEval(embedder, store, { threshold, faqFastPathThreshold });
 
-console.log(`Mode: ${useGemini ? "gemini" : "offline"}   threshold: ${threshold}`);
+console.log(`Mode: ${useGemini ? "gemini" : "offline"}   threshold: ${threshold}   faq-fast-path: ${faqFastPathThreshold ?? "default"}`);
 for (const r of report.results) console.log(`${r.passed ? "PASS" : "FAIL"}  ${r.id.padEnd(24)} ${r.detail}`);
 console.log(`\n${report.passed}/${report.total} passed, recall ${(report.recall * 100).toFixed(0)}%, safety failures ${report.safetyFailures.length}`);
 

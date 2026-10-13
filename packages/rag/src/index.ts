@@ -13,7 +13,7 @@ export {
   type Route,
   type Validation,
 } from "./guard";
-export { retrieve, DEFAULT_THRESHOLD, DEFAULT_TOP_K, type Retrieval, type RetrieveOptions } from "./retrieve";
+export { retrieve, DEFAULT_THRESHOLD, DEFAULT_TOP_K, DEFAULT_FAQ_FAST_PATH_THRESHOLD, type Retrieval, type RetrieveOptions } from "./retrieve";
 export { buildPrompt, sourcesOf, SYSTEM_PROMPT, type BuiltPrompt, type Turn } from "./prompt";
 export { indexDocuments } from "./ingest";
 export { runEval, EVAL_CASES, type EvalCase, type EvalReport } from "./eval";

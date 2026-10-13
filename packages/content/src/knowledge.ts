@@ -20,7 +20,7 @@ export function toKnowledgeDocuments(): KnowledgeDocument[] {
     title: "Profile",
     text: `${profile.name}. ${profile.headline}. Based in ${profile.location}. ${profile.summary} Open to relocation: ${
       profile.availability.relocation ? "yes" : "no"
-    }. Open to visa sponsorship: ${profile.availability.visaSponsorship ? "yes" : "no"}. Contact: email ${profile.email}, LinkedIn ${profile.linkedin}, GitHub ${profile.github}.`,
+    }. Open to visa sponsorship: ${profile.availability.visaSponsorship ? "yes" : "no"}.`,
   });
 
   for (const e of experience) {
@@ -28,7 +28,7 @@ export function toKnowledgeDocuments(): KnowledgeDocument[] {
       id: `experience:${e.id}`,
       source: "experience",
       title: `${e.role} at ${e.company}`,
-      text: `${e.role} at ${e.company}, ${e.location}, from ${e.start} to ${e.end ?? "present"}. ${e.highlights.join(" ")}`,
+      text: `${profile.name}'s work experience: ${e.role} at ${e.company}, ${e.location}, from ${e.start} to ${e.end ?? "present"}. ${e.highlights.join(" ")}`,
     });
   }
 
@@ -37,7 +37,7 @@ export function toKnowledgeDocuments(): KnowledgeDocument[] {
       id: `education:${ed.institution}`,
       source: "education",
       title: `${ed.degree} ${ed.field}`,
-      text: `${ed.degree} in ${ed.field}, ${ed.institution}, ${ed.region}, ${ed.startYear} to ${ed.endYear}. CGPA ${ed.cgpa}.`,
+      text: `${profile.name}'s education: ${ed.degree} in ${ed.field}, ${ed.institution}, ${ed.region}, ${ed.startYear} to ${ed.endYear}. CGPA ${ed.cgpa}.`,
     });
   }
 
@@ -45,7 +45,7 @@ export function toKnowledgeDocuments(): KnowledgeDocument[] {
     id: "skills",
     source: "skills",
     title: "Skills",
-    text: skills.map((s) => `${s.group}: ${s.items.join(", ")}.`).join(" "),
+    text: `${profile.name}'s technical skills. ` + skills.map((s) => `${s.group}: ${s.items.join(", ")}.`).join(" "),
   });
 
   for (const p of projects) {
@@ -53,7 +53,7 @@ export function toKnowledgeDocuments(): KnowledgeDocument[] {
       id: `project:${p.id}`,
       source: "project",
       title: p.name,
-      text: `${p.name}, ${p.type}. ${p.summary} Contributions: ${p.contributions.join(" ")} Stack: ${p.stack.join(", ")}. Live: ${p.liveUrls.join(", ")}.`,
+      text: `${p.name}, ${p.type}, a product ${profile.name} worked on. ${p.summary} Contributions: ${p.contributions.join(" ")} Stack: ${p.stack.join(", ")}. Live: ${p.liveUrls.join(", ")}.`,
     });
   }
 
@@ -63,7 +63,7 @@ export function toKnowledgeDocuments(): KnowledgeDocument[] {
       id: `case-study:${c.id}`,
       source: "case-study",
       title: c.title,
-      text: `${c.title}. Problem: ${c.problem} What was built: ${c.built.join(" ")} Decisions: ${c.decisions.join(" ")} Flow: ${c.flow.join(", ")}.`,
+      text: `${c.title}, a case study by ${profile.name}. Problem: ${c.problem} What was built: ${c.built.join(" ")} Decisions: ${c.decisions.join(" ")} Flow: ${c.flow.join(", ")}.`,
     });
   }
 

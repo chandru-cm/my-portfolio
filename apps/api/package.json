@@ -5,6 +5,7 @@
   "description": "Chat backend: validation, rate limiting, retrieval and streamed answers. See README.md.",
   "type": "module",
   "scripts": {
+    "dev": "node --env-file-if-exists=../../.env --import tsx dev-server.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

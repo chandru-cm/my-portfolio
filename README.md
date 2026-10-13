@@ -169,7 +169,7 @@ Each phase is its own branch, merged to `main` by pull request with small commit
 | 2 | `feat/site-redesign` | New layout, motion, case-study pages, mobile and tablet polish |
 | 3 | `feat/rag-core` | Done. `packages/rag` with tests, an evaluation set, and the ingest script |
 | 4 | `feat/chat-api` | Done offline. `apps/api` chat endpoint, guardrails, rate limit. Live calls and deployment still to verify |
-| 5 | `feat/chat-widget` | Streaming chat UI, suggested questions, accessibility |
+| 5 | `feat/chat-widget` | Done. Streaming chat UI, suggested questions, accessibility, local dev server. Hidden in production until Phase 6 |
 | 6 | `chore/ci-deploy` | GitHub Actions, Vercel projects, environment setup |
 | 7 | `feat/contact-api` | v2 contact endpoint |
 
@@ -181,11 +181,22 @@ Requires Node.js 22 or newer. From the repository root:
 
 ```bash
 npm install
-npm run dev          # portfolio site
+npm run dev          # website AND chat API together (http://localhost:5173)
+npm run dev:web      # website only
+npm run dev:api      # chat API only (http://127.0.0.1:8787)
 npm run typecheck
 npm run build
 npm run preview
 ```
+
+### Chat in development
+
+`npm run dev` starts the website and a local copy of the chat API. The website proxies `/api` to it, so the **Ask about Chandra Moorthy** button works at http://localhost:5173.
+
+- **Live mode** (real Gemini and Pinecone) starts when `.env` has `GEMINI_API_KEY`, `PINECONE_API_KEY` and `PINECONE_INDEX`. The terminal prints `Chat API (LIVE)`.
+- **Offline mode** starts automatically if those are missing or invalid, so the interface can still be developed. It prints the reason, then `Chat API (OFFLINE)`. Answers echo matched context instead of calling a model. Force it with `DEV_API_MODE=offline`.
+- `GEMINI_CHAT_MODEL` must be a model **ID** such as `gemini-3.1-flash-lite`, not the display name shown in AI Studio. You can leave it out: the measured default is used.
+- The widget is always on in development. In production it stays hidden until the API is deployed and `VITE_CHAT_ENABLED=true` is set in Vercel, so visitors never see a button that cannot work.
 
 ### Chatbot knowledge base
 

@@ -16,7 +16,14 @@ export type Retrieval = {
   answerable: boolean;
 };
 
-export const DEFAULT_TOP_K = 4;
+/** The knowledge base is tiny and FAQ entries all repeat the owner's name, so 6 stops them crowding out other documents. */
+export const DEFAULT_TOP_K = 6;
+/**
+ * Score at which a match on an approved FAQ is answered with its stored text, without the model.
+ * Real-embedding evaluation: 0.80 and 0.85 give no wrong-FAQ answers; 0.76 does ("where does
+ * they work" would get the roles FAQ). Re-check with `npm run eval -- --gemini` after content changes.
+ */
+export const DEFAULT_FAQ_FAST_PATH_THRESHOLD = 0.8;
 /**
  * With Gemini embeddings, off-topic questions scored about 0.52 and the weakest genuine
  * answer about 0.68, so 0.60 sits in the gap. Re-check with `npm run eval -- --gemini`

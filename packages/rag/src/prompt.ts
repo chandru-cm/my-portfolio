@@ -43,11 +43,17 @@ export function buildPrompt(input: { question: string; history?: Turn[]; context
   return { system: SYSTEM_PROMPT, messages: [...history, { role: "user", text: final }] };
 }
 
-/** Human-readable source labels for the chat UI, de-duplicated and in match order. */
-export function sourcesOf(context: Match[]): string[] {
+/**
+ * Source labels for the chat UI: de-duplicated, in match order, and limited to matches close to
+ * the best one, so a single-topic answer does not list every loosely related document.
+ */
+export function sourcesOf(context: Match[], options: { max?: number; window?: number } = {}): string[] {
+  const { max = 3, window = 0.1 } = options;
+  const best = context[0]?.score ?? 0;
   const seen = new Set<string>();
   const labels: string[] = [];
   for (const m of context) {
+    if (labels.length >= max || m.score < best - window) break;
     const label = m.metadata.title;
     if (!seen.has(label)) {
       seen.add(label);

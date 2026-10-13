@@ -6,6 +6,8 @@ export type PineconeStoreOptions = {
   /** Name of an existing serverless index: cosine metric, dimension equal to the embedder's. */
   indexName: string;
   namespace?: string;
+  /** Optional index host (from the console). Skips a lookup on every cold start. */
+  host?: string;
 };
 
 const UPSERT_BATCH = 100;
@@ -21,7 +23,7 @@ export class PineconeStore implements VectorStore {
         `PINECONE_INDEX must be the index name (for example "portfolio"), not its host URL. Got "${options.indexName}".`
       );
     }
-    this.index = new Pinecone({ apiKey: options.apiKey }).index(options.indexName).namespace(options.namespace ?? "portfolio");
+    this.index = new Pinecone({ apiKey: options.apiKey }).index(options.indexName, options.host || undefined).namespace(options.namespace ?? "portfolio");
   }
 
   async upsert(records: VectorRecord[]): Promise<void> {

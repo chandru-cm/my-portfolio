@@ -35,8 +35,14 @@ export function createDeps(config: Config): ChatDeps {
       apiKey: config.pineconeApiKey,
       indexName: config.pineconeIndex,
       namespace: config.pineconeNamespace,
+      host: config.pineconeIndexHost,
     }),
-    generator: new GeminiGenerator({ apiKey: config.geminiApiKey, model: config.geminiChatModel }),
+    generator: new GeminiGenerator({
+      apiKey: config.geminiApiKey,
+      model: config.geminiChatModel,
+      fallbackModels: config.geminiFallbackModels,
+      firstTokenTimeoutMs: config.firstTokenTimeoutMs,
+    }),
     limits,
     log: (event) => console.log(JSON.stringify({ evt: "chat", ...event })),
   };

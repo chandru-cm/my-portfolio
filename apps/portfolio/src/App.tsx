@@ -1,12 +1,14 @@
 import { useEffect } from "react";
 import { Route, Routes, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
+import ChatWidget from "./components/ChatWidget";
 import Footer from "./components/Footer";
 import Nav from "./components/Nav";
 import ScrollProgress from "./components/ScrollProgress";
 import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
 import Project from "./pages/Project";
+import { CHAT_ENABLED } from "./lib/site";
 
 /** Scrolls to a #hash target, or to the top on a new page. */
 function useScrollManager() {
@@ -48,6 +50,7 @@ export default function App() {
         </Routes>
       </motion.main>
       <Footer />
+      {CHAT_ENABLED && <ChatWidget />}
     </>
   );
 }
