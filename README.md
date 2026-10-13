@@ -29,7 +29,7 @@ my-portfolio/
 │  └─ api/              Planned. Vercel serverless functions (chat, contact)
 ├─ packages/
 │  ├─ config/           Current. Shared TypeScript base config
-│  ├─ content/          Planned. Single source of truth: profile, projects, case studies, resume text
+│  ├─ content/          Current. Single source of truth: profile, experience, projects, case studies, FAQ
 │  └─ rag/              Planned. Chunking, embeddings, retrieval, prompt building (framework-free, unit-tested)
 ├─ scripts/
 │  └─ ingest.ts         Planned. Builds embeddings from packages/content and loads the vector store
@@ -162,7 +162,7 @@ Each phase is its own branch, merged to `main` by pull request with small commit
 | Phase | Branch | Scope |
 | --- | --- | --- |
 | 0 | `chore/monorepo-structure` | Done. Monorepo, shared config |
-| 1 | `feat/content-package` | `packages/content`: resume, projects, case studies as typed data |
+| 1 | `feat/content-data` | `packages/content`: resume, projects, case studies as typed data. Case studies stay unapproved until the owner signs off |
 | 2 | `feat/site-redesign` | New layout, motion, case-study pages, mobile and tablet polish |
 | 3 | `feat/rag-core` | `packages/rag` with tests and an evaluation set |
 | 4 | `feat/chat-api` | `apps/api` chat endpoint, guardrails, rate limit |
