@@ -1,5 +1,5 @@
 {
-  "name": "@portfolio/config",
+  "name": "@my-portfolio/config",
   "private": true,
   "version": "1.0.0",
   "description": "Shared TypeScript configuration for the portfolio workspaces.",

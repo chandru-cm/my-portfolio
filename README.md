@@ -6,7 +6,7 @@ A personal portfolio built with Vite, React, TypeScript and Framer Motion. The r
 
 ```
 apps/
-  web/        Portfolio site (Vite + React + TypeScript)
+  portfolio/  Portfolio site (Vite + React + TypeScript)
   api/        Reserved for v2: contact-form API (not implemented)
 packages/
   config/     Shared TypeScript config
@@ -35,11 +35,11 @@ npm run preview
 
 | Content | Location |
 | --- | --- |
-| Name, links, project summaries, skills | `apps/web/src/data.ts` |
-| Page structure and sections | `apps/web/src/App.tsx` |
-| Layout, colors, responsive rules | `apps/web/src/styles.css` |
-| Title and search/social description | `apps/web/index.html` |
-| Resume PDF | `apps/web/public/Chandra_Moorthy_Resume.pdf` |
+| Name, links, project summaries, skills | `apps/portfolio/src/data.ts` |
+| Page structure and sections | `apps/portfolio/src/App.tsx` |
+| Layout, colors, responsive rules | `apps/portfolio/src/styles.css` |
+| Title and search/social description | `apps/portfolio/index.html` |
+| Resume PDF | `apps/portfolio/public/Chandra_Moorthy_Resume.pdf` |
 
 ## Before publishing
 
@@ -53,7 +53,7 @@ npm run preview
 
 Import the repository and set:
 
-- Root Directory: `apps/web`
+- Root Directory: `apps/portfolio`
 - Build command: `npm run build`
 - Output directory: `dist`
 

@@ -7,9 +7,9 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "npm run dev -w @portfolio/web",
-    "build": "npm run build -w @portfolio/web",
-    "preview": "npm run preview -w @portfolio/web",
+    "dev": "npm run dev -w @my-portfolio/portfolio",
+    "build": "npm run build -w @my-portfolio/portfolio",
+    "preview": "npm run preview -w @my-portfolio/portfolio",
     "typecheck": "npm run typecheck --workspaces --if-present"
   },
   "engines": {

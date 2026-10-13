@@ -1,0 +1,4 @@
+{
+  "extends": "@my-portfolio/config/tsconfig.base.json",
+  "include": ["src"]
+}

@@ -1,5 +1,5 @@
 {
-  "name": "@portfolio/api",
+  "name": "@my-portfolio/api",
   "private": true,
   "version": "0.0.0",
   "description": "Reserved for v2: contact form API (Vercel serverless function). Not implemented yet."
