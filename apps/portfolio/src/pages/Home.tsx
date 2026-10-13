@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import { education, experience, profile, projects, skills, type Category } from "@my-portfolio/content";
+import CopyEmail from "../components/CopyEmail";
 import ProjectCard from "../components/ProjectCard";
 import Reveal from "../components/Reveal";
 import { HAS_RESUME, RESUME_URL, formatMonth, yearsSince } from "../lib/site";
@@ -226,6 +227,7 @@ function Contact() {
             <a className="btn btn-primary" href={`mailto:${profile.email}`}>
               {profile.email}
             </a>
+            <CopyEmail email={profile.email} />
             <a className="btn" href={profile.linkedin} target="_blank" rel="noreferrer">
               LinkedIn ↗
             </a>

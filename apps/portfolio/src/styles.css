@@ -190,8 +190,7 @@ h3 { font-size: 18px; letter-spacing: -0.02em; }
 .msg-bot a { color: var(--accent); text-underline-offset: 3px; }
 .msg-note { background: var(--warn-soft); color: var(--warn); }
 .msg-note a { color: inherit; }
-.msg-sources { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
-.msg-sources .tag { margin: 0; background: var(--surface); }
+.msg-sources { margin-top: 8px; font-size: 12px; line-height: 1.45; color: var(--muted); }
 .chat-thinking { display: inline-flex; align-items: center; gap: 8px; color: var(--muted); font-size: 13px; }
 .dots { display: inline-flex; gap: 3px; }
 .dots i { width: 5px; height: 5px; border-radius: 50%; background: var(--muted); animation: chat-bounce 1s infinite; }

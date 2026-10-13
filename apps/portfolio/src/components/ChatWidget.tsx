@@ -51,13 +51,7 @@ function Bubble({ m }: { m: ChatMessage }) {
     <div className={`msg msg-bot${tone}`}>
       {m.text ? <span className="msg-text"><Linked text={m.text} /></span> : <Thinking />}
       {m.done && m.kind === "answer" && m.sources && m.sources.length > 0 && (
-        <ul className="msg-sources" aria-label="Sources">
-          {m.sources.map((s) => (
-            <li key={s} className="tag">
-              {s}
-            </li>
-          ))}
-        </ul>
+        <p className="msg-sources">Sources: {m.sources.join(" · ")}</p>
       )}
     </div>
   );
