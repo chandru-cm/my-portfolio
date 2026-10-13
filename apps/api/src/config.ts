@@ -2,6 +2,9 @@ import { DEFAULT_FAQ_FAST_PATH_THRESHOLD, DEFAULT_TOP_K } from "@my-portfolio/ra
 
 export type Env = Record<string, string | undefined>;
 
+export const DEFAULT_CHAT_MODEL = "gemini-3.1-flash-lite";
+export const DEFAULT_FALLBACK_MODELS = "gemini-3.1-flash-lite-preview";
+
 /** The subset of settings the request handler itself needs. */
 export type HandlerConfig = {
   /** Exact origins allowed to call the API, with no trailing slash. */
@@ -68,7 +71,8 @@ export function loadConfig(env: Env, options: { production?: boolean } = {}): Co
   };
 
   const geminiApiKey = need("GEMINI_API_KEY");
-  const geminiChatModel = need("GEMINI_CHAT_MODEL");
+  // Measured on the free tier (see README section 10). Override with GEMINI_CHAT_MODEL when names change.
+  const geminiChatModel = env.GEMINI_CHAT_MODEL?.trim() || DEFAULT_CHAT_MODEL;
   const pineconeApiKey = need("PINECONE_API_KEY");
   const pineconeIndex = need("PINECONE_INDEX");
   if (pineconeIndex && (/^https?:\/\//i.test(pineconeIndex) || pineconeIndex.includes("."))) {
@@ -105,6 +109,14 @@ export function loadConfig(env: Env, options: { production?: boolean } = {}): Co
     else faqFastPathThreshold = t;
   }
 
+  // Model IDs are lowercase with hyphens, like "gemini-3.1-flash-lite". A display name such as
+  // "Gemini 3.1 Flash Lite" is rejected by the API with an unhelpful 400, so catch it here.
+  const looksLikeId = (m: string) => /^[a-z0-9][a-z0-9._-]*$/.test(m);
+  const fallbackModels = (env.GEMINI_CHAT_FALLBACK_MODELS ?? DEFAULT_FALLBACK_MODELS).split(",").map((m) => m.trim()).filter(Boolean);
+  for (const [name, value] of [["GEMINI_CHAT_MODEL", geminiChatModel], ...fallbackModels.map((m) => ["GEMINI_CHAT_FALLBACK_MODELS", m])] as [string, string][]) {
+    if (!looksLikeId(value)) problems.push(`${name} must be a model ID like "${DEFAULT_CHAT_MODEL}" (lowercase, hyphens, no spaces), not a display name. Got "${value}"`);
+  }
+
   const config: Config = {
     allowedOrigins,
     allowMissingOrigin: !production,
@@ -114,7 +126,7 @@ export function loadConfig(env: Env, options: { production?: boolean } = {}): Co
     faqFastPathThreshold,
     geminiApiKey,
     geminiChatModel,
-    geminiFallbackModels: (env.GEMINI_CHAT_FALLBACK_MODELS ?? "").split(",").map((m) => m.trim()).filter(Boolean),
+    geminiFallbackModels: fallbackModels,
     firstTokenTimeoutMs: int(env, "GEMINI_FIRST_TOKEN_TIMEOUT_MS", 15000, problems),
     geminiEmbeddingModel: env.GEMINI_EMBEDDING_MODEL || undefined,
     dimensions: int(env, "EMBEDDING_DIMENSIONS", 768, problems),

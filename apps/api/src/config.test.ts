@@ -9,8 +9,11 @@ const base = {
   PINECONE_INDEX: "portfolio",
 };
 
-test("local mode needs only the four core settings and allows a missing Origin", () => {
-  const c = loadConfig(base, { production: false });
+test("local mode needs only the keys and index, and allows a missing Origin", () => {
+  const { GEMINI_CHAT_MODEL: _omit, ...withoutModel } = base;
+  const c = loadConfig(withoutModel, { production: false });
+  assert.equal(c.geminiChatModel, "gemini-3.1-flash-lite");
+  assert.deepEqual(c.geminiFallbackModels, ["gemini-3.1-flash-lite-preview"]);
   assert.equal(c.threshold, 0.6);
   assert.equal(c.perMinute, 10);
   assert.equal(c.allowMissingOrigin, true);
@@ -23,7 +26,7 @@ test("reports every missing setting at once, by name only", () => {
     assert.fail("should throw");
   } catch (e) {
     assert.ok(e instanceof ConfigError);
-    for (const name of ["GEMINI_API_KEY", "GEMINI_CHAT_MODEL", "PINECONE_API_KEY", "PINECONE_INDEX"]) {
+    for (const name of ["GEMINI_API_KEY", "PINECONE_API_KEY", "PINECONE_INDEX"]) {
       assert.match(e.message, new RegExp(name));
     }
   }
@@ -56,4 +59,13 @@ test("error messages never contain secret values", () => {
   } catch (e) {
     assert.doesNotMatch((e as Error).message, /SECRET-VALUE-123/);
   }
+});
+
+test("rejects a model display name and says what a model ID looks like", () => {
+  assert.throws(
+    () => loadConfig({ ...base, GEMINI_CHAT_MODEL: "Gemini 3.5 Flash Lite" }, { production: false }),
+    /model ID like "gemini-3\.1-flash-lite".*Got "Gemini 3\.5 Flash Lite"/
+  );
+  assert.throws(() => loadConfig({ ...base, GEMINI_CHAT_FALLBACK_MODELS: "gemini-3.1-flash-lite, Some Name" }, { production: false }), /FALLBACK/);
+  assert.doesNotThrow(() => loadConfig({ ...base, GEMINI_CHAT_MODEL: "gemini-flash-latest" }, { production: false }));
 });
