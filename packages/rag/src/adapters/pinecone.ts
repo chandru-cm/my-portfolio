@@ -16,6 +16,11 @@ export class PineconeStore implements VectorStore {
   constructor(options: PineconeStoreOptions) {
     if (!options.apiKey) throw new Error("PINECONE_API_KEY is required");
     if (!options.indexName) throw new Error("PINECONE_INDEX is required");
+    if (/^https?:\/\//i.test(options.indexName) || options.indexName.includes(".")) {
+      throw new Error(
+        `PINECONE_INDEX must be the index name (for example "portfolio"), not its host URL. Got "${options.indexName}".`
+      );
+    }
     this.index = new Pinecone({ apiKey: options.apiKey }).index(options.indexName).namespace(options.namespace ?? "portfolio");
   }
 
