@@ -4,7 +4,7 @@ The serverless backend behind the portfolio's "Ask about Chandra Moorthy" chatbo
 
 Deployed as Vercel Functions. All services run on free tiers.
 
-> Status legend: **Planned** = designed here, not built yet. This README is written first so the implementation can be reviewed against it.
+> Status: the handler, rate limiting, config, tests and command-line runner are **built and tested offline**. Deployment, the Gemini chat model name, and live calls are **not yet verified** (see section 8).
 
 ---
 
@@ -39,7 +39,7 @@ Request (`Content-Type: application/json`, body at most 4 KB):
 | Field | Rule |
 | --- | --- |
 | `message` | Required string, 1 to 300 characters after trimming |
-| `history` | Optional array of at most 6 `{ role: "user" \| "assistant", text: string }`, each text at most 500 characters. Only the last 6 are used. |
+| `history` | Optional array of at most 20 `{ role: "user" \| "assistant", text: string }`. Only the last 6 are used, each cut to 500 characters. |
 
 Success: `200`, `Content-Type: text/event-stream`. Every successful reply uses the same event shape, including refusals, so the client has one code path:
 
@@ -110,7 +110,7 @@ Steps are ordered so the cheapest checks run first and requests are stopped befo
 
 ---
 
-## 4. Code layout (Planned)
+## 4. Code layout
 
 ```
 apps/api/
@@ -122,7 +122,7 @@ apps/api/
 │  ├─ config.ts      loadConfig(env): parses and validates settings
 │  ├─ http.ts        JSON errors, CORS headers, SSE encoding, client IP
 │  ├─ limiter.ts     RateLimiter interface, in-memory limiter, Upstash limiter
-│  ├─ generator.ts   Generator interface (Gemini adapter lives in packages/rag)
+│  ├─ testkit.ts     Fake services and helpers shared by tests and the CLI
 │  ├─ deps.ts        Composition root: builds real dependencies from env
 │  └─ *.test.ts      Tests with fake dependencies
 └─ README.md

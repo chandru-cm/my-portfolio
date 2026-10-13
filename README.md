@@ -26,7 +26,7 @@ Hosted on Vercel. All services used are free-tier.
 my-portfolio/
 ├─ apps/
 │  ├─ portfolio/        Current. Vite + React + TypeScript site
-│  └─ api/              Planned. Vercel serverless functions (chat, contact)
+│  └─ api/              Current. Chat backend (Vercel functions). See apps/api/README.md
 ├─ packages/
 │  ├─ config/           Current. Shared TypeScript base config
 │  ├─ content/          Current. Single source of truth: profile, experience, projects, case studies, FAQ
@@ -116,7 +116,9 @@ Free-tier limits and terms change. Verify them before relying on them. Free-tier
 
 ---
 
-## 5. Backend plan (apps/api, Planned)
+## 5. Backend (apps/api)
+
+Built and tested offline. The full contract, flow, configuration and testing guide are in [apps/api/README.md](apps/api/README.md).
 
 | Endpoint | Purpose |
 | --- | --- |
@@ -166,7 +168,7 @@ Each phase is its own branch, merged to `main` by pull request with small commit
 | 1 | `feat/content-data` | `packages/content`: resume, projects, case studies as typed data. Case studies stay unapproved until the owner signs off |
 | 2 | `feat/site-redesign` | New layout, motion, case-study pages, mobile and tablet polish |
 | 3 | `feat/rag-core` | Done. `packages/rag` with tests, an evaluation set, and the ingest script |
-| 4 | `feat/chat-api` | `apps/api` chat endpoint, guardrails, rate limit |
+| 4 | `feat/chat-api` | Done offline. `apps/api` chat endpoint, guardrails, rate limit. Live calls and deployment still to verify |
 | 5 | `feat/chat-widget` | Streaming chat UI, suggested questions, accessibility |
 | 6 | `chore/ci-deploy` | GitHub Actions, Vercel projects, environment setup |
 | 7 | `feat/contact-api` | v2 contact endpoint |
@@ -191,6 +193,7 @@ npm run preview
 npm test                       # unit tests, offline
 npm run eval                   # offline guardrail and pipeline check, no keys
 npm run eval -- --gemini       # real recall check (needs GEMINI_API_KEY in .env)
+npm run chat -- "question"       # ask the backend from the terminal, offline (add --live for real Gemini + Pinecone)
 npm run check:pinecone         # verify index name, dimension, metric and record counts
 npm run ingest -- --dry-run    # show what would be indexed
 npm run ingest                 # embed and upsert to Pinecone (idempotent)
