@@ -30,11 +30,12 @@ my-portfolio/
 ├─ packages/
 │  ├─ config/           Current. Shared TypeScript base config
 │  ├─ content/          Current. Single source of truth: profile, experience, projects, case studies, FAQ
-│  └─ rag/              Planned. Chunking, embeddings, retrieval, prompt building (framework-free, unit-tested)
+│  └─ rag/              Current. Chunking, embeddings, retrieval, guardrails, prompt building (unit-tested)
 ├─ scripts/
-│  └─ ingest.ts         Planned. Builds embeddings from packages/content and loads the vector store
+│  ├─ ingest.ts         Current. Builds embeddings from packages/content and loads Pinecone
+│  └─ eval.ts           Current. Retrieval and guardrail evaluation
 ├─ .github/workflows/   Planned. CI: typecheck, test, build
-├─ .env.example         Planned. Names of required variables, no values
+├─ .env.example         Current. Names of required variables, no values
 └─ README.md
 ```
 
@@ -164,7 +165,7 @@ Each phase is its own branch, merged to `main` by pull request with small commit
 | 0 | `chore/monorepo-structure` | Done. Monorepo, shared config |
 | 1 | `feat/content-data` | `packages/content`: resume, projects, case studies as typed data. Case studies stay unapproved until the owner signs off |
 | 2 | `feat/site-redesign` | New layout, motion, case-study pages, mobile and tablet polish |
-| 3 | `feat/rag-core` | `packages/rag` with tests and an evaluation set |
+| 3 | `feat/rag-core` | Done. `packages/rag` with tests, an evaluation set, and the ingest script |
 | 4 | `feat/chat-api` | `apps/api` chat endpoint, guardrails, rate limit |
 | 5 | `feat/chat-widget` | Streaming chat UI, suggested questions, accessibility |
 | 6 | `chore/ci-deploy` | GitHub Actions, Vercel projects, environment setup |
@@ -174,7 +175,7 @@ Each phase is its own branch, merged to `main` by pull request with small commit
 
 ## 8. Run locally
 
-Requires Node.js 18 or newer. From the repository root:
+Requires Node.js 22 or newer. From the repository root:
 
 ```bash
 npm install
@@ -183,6 +184,19 @@ npm run typecheck
 npm run build
 npm run preview
 ```
+
+### Chatbot knowledge base
+
+```bash
+npm test                       # unit tests, offline
+npm run eval                   # offline guardrail and pipeline check, no keys
+npm run eval -- --gemini       # real recall check (needs GEMINI_API_KEY in .env)
+npm run ingest -- --dry-run    # show what would be indexed
+npm run ingest                 # embed and upsert to Pinecone (idempotent)
+npm run ingest -- --reset      # wipe the namespace, then re-index
+```
+
+Copy `.env.example` to `.env` and fill in your own keys first. Create the Pinecone index beforehand: serverless, cosine metric, dimension 768.
 
 ---
 
