@@ -9,20 +9,23 @@ import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
 import Project from "./pages/Project";
 import { CHAT_ENABLED } from "./lib/site";
+import { scrollToId } from "./lib/scroll";
 
-/** Scrolls to a #hash target, or to the top on a new page. */
+/**
+ * Scrolls to a #hash target, or to the top on a new page.
+ * Depends on location.key, which changes on every navigation, so clicking a link whose address
+ * is already the current one (for example "Work" while the URL says #work) still scrolls.
+ * Respects the visitor's reduce-motion setting.
+ */
 function useScrollManager() {
-  const { pathname, hash } = useLocation();
+  const { pathname, hash, key } = useLocation();
   useEffect(() => {
     if (hash) {
-      // Wait a frame so the target section exists after a route change.
-      const id = requestAnimationFrame(() =>
-        document.getElementById(hash.slice(1))?.scrollIntoView({ behavior: "smooth", block: "start" })
-      );
-      return () => cancelAnimationFrame(id);
+      scrollToId(hash.slice(1));
+      return;
     }
     window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
-  }, [pathname, hash]);
+  }, [pathname, hash, key]);
 }
 
 export default function App() {

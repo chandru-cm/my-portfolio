@@ -1,4 +1,5 @@
 import { profile } from "@my-portfolio/content";
+import { scrollToTop } from "../lib/scroll";
 
 export default function Footer() {
   return (
@@ -18,7 +19,7 @@ export default function Footer() {
           {" · "}
           <a href={`mailto:${profile.email}`}>Email</a>
         </span>
-        <button className="to-top" type="button" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
+        <button className="to-top" type="button" onClick={scrollToTop}>
           Back to top ↑
         </button>
       </div>
