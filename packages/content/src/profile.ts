@@ -7,8 +7,7 @@ export const profile: Profile = {
   location: "Chennai, India",
   email: "cmchandru77@gmail.com",
   linkedin: "https://www.linkedin.com/in/chandra-moorthy-5a3156193",
-  // TODO(owner): confirm this is the correct public GitHub account.
-  github: "https://github.com/chandu-dev",
+  github: "https://github.com/chandru-cm",
   summary:
     "Software engineer with 2 years of experience building production multi-tenant SaaS platforms with Node.js, TypeScript and PostgreSQL, plus Angular, React, React Native and Firebase. Delivered REST APIs, role-based access control, payment workflows, financial reporting and generative AI features (Google Vertex AI, Gemini, Pinecone) across property management, community finance and education products.",
   availability: {
