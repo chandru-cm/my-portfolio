@@ -1,6 +1,20 @@
 {
   "name": "@my-portfolio/api",
   "private": true,
-  "version": "0.0.0",
-  "description": "Reserved for v2: contact form API (Vercel serverless function). Not implemented yet."
+  "version": "0.1.0",
+  "description": "Chat backend: validation, rate limiting, retrieval and streamed answers. See README.md.",
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@my-portfolio/content": "*",
+    "@my-portfolio/rag": "*",
+    "@upstash/ratelimit": "^2.2.0",
+    "@upstash/redis": "^1.39.0"
+  },
+  "devDependencies": {
+    "@my-portfolio/config": "*",
+    "typescript": "^5.6.3"
+  }
 }

@@ -10,9 +10,18 @@
     "dev": "npm run dev -w @my-portfolio/portfolio",
     "build": "npm run build -w @my-portfolio/portfolio",
     "preview": "npm run preview -w @my-portfolio/portfolio",
-    "typecheck": "npm run typecheck --workspaces --if-present"
+    "typecheck": "npm run typecheck --workspaces --if-present && tsc --noEmit -p scripts",
+    "test": "node --import tsx --test \"packages/**/*.test.ts\" \"apps/api/**/*.test.ts\"",
+    "eval": "node --env-file-if-exists=.env --import tsx scripts/eval.ts",
+    "ingest": "node --env-file-if-exists=.env --import tsx scripts/ingest.ts",
+    "check:pinecone": "node --env-file-if-exists=.env --import tsx scripts/check-pinecone.ts",
+    "chat": "node --env-file-if-exists=.env --import tsx scripts/chat.ts"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=22"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "tsx": "^4.23.15"
   }
 }

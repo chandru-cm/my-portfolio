@@ -1,0 +1,5 @@
+{
+  "extends": "@my-portfolio/config/tsconfig.base.json",
+  "compilerOptions": { "types": ["node"], "target": "ES2022", "module": "ESNext" },
+  "include": ["."]
+}
