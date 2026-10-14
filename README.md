@@ -213,6 +213,7 @@ npm test                       # unit tests, offline
 npm run eval                   # offline guardrail and pipeline check, no keys
 npm run eval -- --gemini       # real recall check (needs GEMINI_API_KEY in .env)
 npm run chat -- "question"       # ask the backend from the terminal, offline (add --live for real Gemini + Pinecone)
+npm run build:vercel           # build the website and API into one Vercel project's output
 npm run smoke -- <api-url> <site-url>   # check a live deployment end to end, with timings
 npm run resume                 # regenerate the phone-free resume PDF from the site content
 npm run check:pinecone         # verify index name, dimension, metric and record counts
