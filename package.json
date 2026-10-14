@@ -19,7 +19,8 @@
     "dev:web": "npm run dev -w @my-portfolio/portfolio",
     "dev:api": "npm run dev -w @my-portfolio/api",
     "build:api": "npm run build -w @my-portfolio/api",
-    "resume": "node --import tsx scripts/resume.ts"
+    "resume": "node --import tsx scripts/resume.ts",
+    "smoke": "node --import tsx scripts/smoke.ts"
   },
   "engines": {
     "node": ">=22"

@@ -97,7 +97,28 @@ These are written into the site when it is built, so changing them later means r
 
 Each project needs the other's address, so one of them always gets configured after the first deploy. That is normal.
 
-## 6. Test the live site
+**Region:** leave the API's function region at Vercel's default (Washington DC, `iad1`). Your Pinecone index is in AWS `us-east-1`, so the two are close together. Pick an Upstash region near there too.
+
+## 6. Test the live deployment
+
+Run the automated check from your machine (it needs no keys):
+
+```bash
+npm run smoke -- https://YOUR-API.vercel.app https://YOUR-SITE.vercel.app
+```
+
+It checks the API health, the CORS rules, that other origins are rejected, the private-details refusal, an instant FAQ answer, "I don't know" for off-topic questions, a model-written answer, and that the website, a deep link and the résumé PDF load. Expected timings on the free tiers:
+
+| Check | Normal |
+| --- | --- |
+| Health, refusal | well under 1 s |
+| Instant FAQ answer | about 4 s on a cold start, under 1 s when warm (set `PINECONE_INDEX_HOST` to avoid a 3 s lookup) |
+| Off-topic ("I don't know") | about 1 to 4 s |
+| Model-written answer | 2 to 15 s, varying with Gemini's free-tier load |
+
+A slow or unavailable model is reported as a warning, not a failure, because it depends on Google's capacity. Everything else must pass.
+
+Then check by eye:
 
 1. Open the website's production address.
 2. Click **Ask about Chandra Moorthy** and try:
