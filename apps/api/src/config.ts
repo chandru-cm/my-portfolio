@@ -3,7 +3,9 @@ import { DEFAULT_FAQ_FAST_PATH_THRESHOLD, DEFAULT_TOP_K } from "@my-portfolio/ra
 export type Env = Record<string, string | undefined>;
 
 export const DEFAULT_CHAT_MODEL = "gemini-3.1-flash-lite";
-export const DEFAULT_FALLBACK_MODELS = "gemini-3.1-flash-lite-preview";
+// Free-tier capacity swings by the hour: in one session the 3.1 models returned 503 on every try while
+// 3.5 answered, and earlier the reverse. Mix families so one is usually available.
+export const DEFAULT_FALLBACK_MODELS = "gemini-3.1-flash-lite-preview,gemini-3.5-flash-lite";
 
 /** The subset of settings the request handler itself needs. */
 export type HandlerConfig = {
