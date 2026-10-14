@@ -43,6 +43,29 @@ test("production also requires allowed origins and Upstash credentials, and forb
   assert.ok(c.upstash);
 });
 
+test("allows this deployment's own Vercel addresses without ALLOWED_ORIGINS", () => {
+  const c = loadConfig(
+    {
+      ...base,
+      UPSTASH_REDIS_REST_URL: "https://u",
+      UPSTASH_REDIS_REST_TOKEN: "t",
+      VERCEL_PROJECT_PRODUCTION_URL: "my-site.vercel.app",
+      VERCEL_URL: "my-site-abc123.vercel.app",
+      VERCEL_BRANCH_URL: "https://my-site-git-main.vercel.app/",
+    },
+    { production: true }
+  );
+  assert.deepEqual(c.allowedOrigins, ["https://my-site.vercel.app", "https://my-site-abc123.vercel.app", "https://my-site-git-main.vercel.app"]);
+});
+
+test("explicit origins and Vercel's own are combined without duplicates, and junk hosts are ignored", () => {
+  const c = loadConfig(
+    { ...base, ALLOWED_ORIGINS: "https://my-site.vercel.app, https://custom.example", VERCEL_PROJECT_PRODUCTION_URL: "my-site.vercel.app", VERCEL_URL: "bad host;rm -rf" },
+    { production: false }
+  );
+  assert.deepEqual(c.allowedOrigins, ["https://my-site.vercel.app", "https://custom.example"]);
+});
+
 test("rejects a half-configured Upstash and bad numbers", () => {
   assert.throws(() => loadConfig({ ...base, UPSTASH_REDIS_REST_URL: "https://u" }, { production: false }), /both UPSTASH/);
   assert.throws(() => loadConfig({ ...base, RATE_LIMIT_PER_MINUTE: "0" }, { production: false }), /RATE_LIMIT_PER_MINUTE/);

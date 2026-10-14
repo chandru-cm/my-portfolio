@@ -55,6 +55,20 @@ function int(env: Env, name: string, fallback: number, problems: string[]): numb
   return n;
 }
 
+/**
+ * The addresses Vercel gives this very deployment (its production domain, this deployment's URL and
+ * the branch URL), as https origins. When the website and the API are one project, the page that calls
+ * the API is served from one of these, so it is allowed without any setting. Other sites still need
+ * ALLOWED_ORIGINS. Vercel exposes these variables without a protocol.
+ */
+export function vercelOrigins(env: Env): string[] {
+  const hosts = [env.VERCEL_PROJECT_PRODUCTION_URL, env.VERCEL_URL, env.VERCEL_BRANCH_URL];
+  return hosts
+    .map((h) => h?.trim().replace(/^https?:\/\//, "").replace(/\/+$/, ""))
+    .filter((h): h is string => !!h && /^[a-z0-9.-]+$/i.test(h))
+    .map((h) => `https://${h}`);
+}
+
 export function isProduction(env: Env): boolean {
   return env.VERCEL_ENV === "production" || env.NODE_ENV === "production";
 }
@@ -81,10 +95,15 @@ export function loadConfig(env: Env, options: { production?: boolean } = {}): Co
     problems.push("PINECONE_INDEX must be the index name, not its host URL");
   }
 
-  const allowedOrigins = (env.ALLOWED_ORIGINS ?? "")
-    .split(",")
-    .map((o) => o.trim().replace(/\/+$/, ""))
-    .filter(Boolean);
+  const allowedOrigins = [
+    ...new Set([
+      ...(env.ALLOWED_ORIGINS ?? "")
+        .split(",")
+        .map((o) => o.trim().replace(/\/+$/, ""))
+        .filter(Boolean),
+      ...vercelOrigins(env),
+    ]),
+  ];
   const upstashUrl = env.UPSTASH_REDIS_REST_URL?.trim();
   const upstashToken = env.UPSTASH_REDIS_REST_TOKEN?.trim();
 
