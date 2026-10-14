@@ -31,7 +31,7 @@ if (useGemini) {
   threshold = Number(process.env.RETRIEVAL_THRESHOLD ?? DEFAULT_THRESHOLD);
 } else {
   embedder = new LexicalEmbedder();
-  threshold = Number(process.env.RETRIEVAL_THRESHOLD ?? 0.2);
+  threshold = Number(process.env.RETRIEVAL_THRESHOLD ?? 0.32);
 }
 
 const store = new InMemoryVectorStore();

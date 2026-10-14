@@ -3,6 +3,8 @@ import type { Project } from "./types";
 export const projects: Project[] = [
   {
     id: "renteasify",
+    myPart: "Backend workflows for billing, leases and deposits, plus association finance and AI-written listings.",
+    userRoles: ["Owners", "Managers", "Tenants", "Applicants", "Association users"],
     name: "RentEasify",
     type: "Rental management SaaS",
     summary:
@@ -24,6 +26,7 @@ export const projects: Project[] = [
   },
   {
     id: "socibooks",
+    myPart: "Member administration, role-based access control, and financial reporting.",
     name: "SociBooks",
     type: "Community association management SaaS",
     summary:
@@ -39,6 +42,7 @@ export const projects: Project[] = [
   },
   {
     id: "digivcards",
+    myPart: "Card sharing, lead tracking and analytics, AI content generation, and payments.",
     name: "DigiVCards.ai",
     type: "Digital visiting card SaaS",
     summary:
@@ -53,6 +57,7 @@ export const projects: Project[] = [
   },
   {
     id: "kalaivani-erp",
+    myPart: "React Native features for parents, teachers and drivers, including live bus tracking.",
     name: "Kalaivani ERP",
     type: "School management platform",
     summary:

@@ -7,7 +7,7 @@ import { indexDocuments } from "./ingest";
 import { LexicalEmbedder } from "./lexicalEmbedder";
 
 // The offline embedder only matches shared words, so it needs a lower bar than real embeddings.
-const OFFLINE_THRESHOLD = 0.2;
+const OFFLINE_THRESHOLD = 0.32;
 
 test("offline evaluation: guardrails hold and the pipeline retrieves sensibly", async () => {
   const embedder = new LexicalEmbedder();

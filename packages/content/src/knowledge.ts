@@ -53,7 +53,7 @@ export function toKnowledgeDocuments(): KnowledgeDocument[] {
       id: `project:${p.id}`,
       source: "project",
       title: p.name,
-      text: `${p.name}, ${p.type}, a product ${profile.name} worked on. ${p.summary} Contributions: ${p.contributions.join(" ")} Stack: ${p.stack.join(", ")}. Live: ${p.liveUrls.join(", ")}.`,
+      text: `${p.name}, ${p.type}, a product ${profile.name} worked on. ${p.summary} Their part: ${p.myPart} Contributions: ${p.contributions.join(" ")} Stack: ${p.stack.join(", ")}. Live: ${p.liveUrls.join(", ")}.`,
     });
   }
 

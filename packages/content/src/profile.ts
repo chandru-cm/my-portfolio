@@ -3,7 +3,7 @@ import type { Profile } from "./types";
 // Phone number is intentionally not part of the public content.
 export const profile: Profile = {
   name: "Chandra Moorthy",
-  headline: "Full-stack engineer building AI-integrated SaaS",
+  headline: "Full-stack engineer: the payments, permissions and AI behind multi-tenant SaaS",
   location: "Chennai, India",
   email: "cmchandru77@gmail.com",
   linkedin: "https://www.linkedin.com/in/chandra-moorthy-5a3156193",

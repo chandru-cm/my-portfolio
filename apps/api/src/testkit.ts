@@ -51,7 +51,7 @@ export async function makeDeps(overrides: Partial<ChatDeps> = {}): Promise<ChatD
       allowedOrigins: [SITE],
       allowMissingOrigin: false,
       // The offline embedder only matches shared words, so it uses a lower bar than Gemini.
-      threshold: 0.2,
+      threshold: 0.32,
       topK: 6,
       maxBodyBytes: 4096,
       faqFastPathThreshold: 2, // disabled by default in tests: scores never exceed 1
