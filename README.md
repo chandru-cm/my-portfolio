@@ -170,7 +170,7 @@ Each phase is its own branch, merged to `main` by pull request with small commit
 | 3 | `feat/rag-core` | Done. `packages/rag` with tests, an evaluation set, and the ingest script |
 | 4 | `feat/chat-api` | Done offline. `apps/api` chat endpoint, guardrails, rate limit. Live calls and deployment still to verify |
 | 5 | `feat/chat-widget` | Done. Streaming chat UI, suggested questions, accessibility, local dev server. Hidden in production until Phase 6 |
-| 6 | `chore/ci-deploy` | GitHub Actions, Vercel projects, environment setup |
+| 6 | `feat/deploy-config` | API bundling for Vercel, GitHub Actions CI, [DEPLOYMENT.md](DEPLOYMENT.md). Done in the repo; deploying is next |
 | 7 | `feat/contact-api` | v2 contact endpoint |
 
 ---

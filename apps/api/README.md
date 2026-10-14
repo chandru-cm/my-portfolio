@@ -114,13 +114,17 @@ Steps are ordered so the cheapest checks run first and requests are stopped befo
 
 ```
 apps/api/
-├─ api/
-│  ├─ chat.ts        Vercel entry: default export { fetch }, wires real dependencies
+├─ functions/
+│  ├─ chat.ts        Vercel entry: wires real dependencies into handleChat
 │  └─ health.ts
+├─ scripts/build.mjs Bundles each function into one file and writes Vercel's output format
+├─ public/           Placeholder page for the API's root address
+├─ vercel.json       Build command
 ├─ src/
 │  ├─ chat.ts        handleChat(request, deps): the whole flow, pure and testable
 │  ├─ config.ts      loadConfig(env): parses and validates settings
 │  ├─ http.ts        JSON errors, CORS headers, SSE encoding, client IP
+│  ├─ node.ts        Adapts handleChat (Request to Response) to Node's req and res; shared by Vercel and the dev server
 │  ├─ limiter.ts     RateLimiter interface, in-memory limiter, Upstash limiter
 │  ├─ testkit.ts     Fake services and helpers shared by tests and the CLI
 │  ├─ deps.ts        Composition root: builds real dependencies from env
@@ -223,25 +227,13 @@ A small local HTTP server is deliberately not part of this phase. It is only nee
 
 ---
 
-## 8. Deployment (Planned)
+## 8. Deployment
 
-A separate Vercel project from the website:
+See [DEPLOYMENT.md](../../DEPLOYMENT.md) at the repository root for the step-by-step guide.
 
-| Setting | Value |
-| --- | --- |
-| Root Directory | `apps/api` |
-| Include source files outside the Root Directory | on (the API imports `packages/rag` and `packages/content`) |
-| Environment variables | Section 5, in Vercel project settings |
+How it is built: `npm run build -w @my-portfolio/api` bundles each function into a single self-contained file and writes Vercel's Build Output format under `.vercel/output`. Bundling means Vercel never has to resolve this repository's TypeScript workspace packages at runtime, a known source of deploy failures. The built functions were loaded and exercised the way Vercel's Node launcher runs them, live against Gemini and Pinecone.
 
-The website reaches it through a rewrite of `/api/*` to the API project, so the browser sees a single origin.
-
-Open items to verify at deployment time, because they cannot be proven locally:
-
-1. That Vercel compiles the workspace TypeScript packages imported by the functions. Fallback: bundle the handler with esbuild before deploy.
-2. That the `{ fetch }` default-export handler and streaming behave as expected on the Node.js runtime.
-3. That the chosen Gemini chat model is available on the free tier.
-
----
+What can only be confirmed on Vercel itself: that it picks up `.vercel/output` from the build, and the 30-second function limit. DEPLOYMENT.md lists how to check.
 
 ## 9. Troubleshooting
 

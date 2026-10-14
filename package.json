@@ -17,7 +17,8 @@
     "check:pinecone": "node --env-file-if-exists=.env --import tsx scripts/check-pinecone.ts",
     "chat": "node --env-file-if-exists=.env --import tsx scripts/chat.ts",
     "dev:web": "npm run dev -w @my-portfolio/portfolio",
-    "dev:api": "npm run dev -w @my-portfolio/api"
+    "dev:api": "npm run dev -w @my-portfolio/api",
+    "build:api": "npm run build -w @my-portfolio/api"
   },
   "engines": {
     "node": ">=22"

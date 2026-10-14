@@ -9,3 +9,6 @@ dist
 
 # Resume contains a phone number: do not commit until a public version is chosen
 apps/portfolio/public/Chandra_Moorthy_Resume.pdf
+
+# Vercel build output (generated)
+.vercel

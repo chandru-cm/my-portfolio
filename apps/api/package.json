@@ -5,6 +5,7 @@
   "description": "Chat backend: validation, rate limiting, retrieval and streamed answers. See README.md.",
   "type": "module",
   "scripts": {
+    "build": "node scripts/build.mjs",
     "dev": "node --env-file-if-exists=../../.env --import tsx dev-server.ts",
     "typecheck": "tsc --noEmit"
   },
@@ -16,6 +17,7 @@
   },
   "devDependencies": {
     "@my-portfolio/config": "*",
+    "esbuild": "^0.21.5",
     "typescript": "^5.6.3"
   }
 }
