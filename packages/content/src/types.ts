@@ -46,6 +46,10 @@ export type Project = {
   name: string;
   type: string;
   summary: string;
+  /** One line on what the owner personally did, from the resume. Shown on cards and project pages. */
+  myPart: string;
+  /** User roles the product serves, when the resume names them. Source of the "5 roles" figure. */
+  userRoles?: string[];
   contributions: string[];
   stack: string[];
   categories: Category[];

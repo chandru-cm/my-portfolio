@@ -7,8 +7,9 @@ dist
 .env.*
 !.env.example
 
-# Resume contains a phone number: do not commit until a public version is chosen
-apps/portfolio/public/Chandra_Moorthy_Resume.pdf
+# Personal resume copies (may contain a phone number) stay local
+*.local.pdf
+.private/
 
 # Vercel build output (generated)
 .vercel

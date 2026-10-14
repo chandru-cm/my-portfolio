@@ -11,6 +11,9 @@ export default function ProjectCard({ project, index }: Props) {
       </span>
       <h3>{project.name}</h3>
       <p className="muted">{project.summary}</p>
+      <p className="my-part">
+        <b>My part:</b> {project.myPart}
+      </p>
       <ul className="tags" aria-label="Technology stack">
         {project.stack.slice(0, 5).map((s) => (
           <li className="tag" key={s}>

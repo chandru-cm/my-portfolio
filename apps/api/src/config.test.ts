@@ -13,7 +13,7 @@ test("local mode needs only the keys and index, and allows a missing Origin", ()
   const { GEMINI_CHAT_MODEL: _omit, ...withoutModel } = base;
   const c = loadConfig(withoutModel, { production: false });
   assert.equal(c.geminiChatModel, "gemini-3.1-flash-lite");
-  assert.deepEqual(c.geminiFallbackModels, ["gemini-3.1-flash-lite-preview"]);
+  assert.deepEqual(c.geminiFallbackModels, ["gemini-3.1-flash-lite-preview", "gemini-3.5-flash-lite"]);
   assert.equal(c.threshold, 0.6);
   assert.equal(c.perMinute, 10);
   assert.equal(c.allowMissingOrigin, true);

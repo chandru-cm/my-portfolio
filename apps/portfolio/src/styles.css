@@ -216,3 +216,7 @@ h3 { font-size: 18px; letter-spacing: -0.02em; }
   .msg { max-width: 94%; }
 }
 @media (prefers-reduced-motion: reduce) { .dots i { animation: none; } }
+
+.my-part { margin-top: 8px; font-size: 14px; line-height: 1.55; color: var(--muted); }
+.my-part b { font-weight: 500; color: var(--ink); }
+.my-part-lg { font-size: 16px; margin: -10px 0 18px; max-width: 58ch; }

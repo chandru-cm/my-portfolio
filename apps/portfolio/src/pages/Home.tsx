@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { AnimatePresence, motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import { education, experience, profile, projects, skills, type Category } from "@my-portfolio/content";
 import CopyEmail from "../components/CopyEmail";
@@ -9,23 +9,16 @@ import { useDocumentTitle } from "../hooks/useDocumentTitle";
 
 type Filter = "All" | Category;
 const FILTERS: Filter[] = ["All", "Backend", "AI", "Mobile"];
-const WORDS = ["AI-integrated", "multi-tenant", "payment-ready"];
-
 function Hero() {
   const reduce = useReducedMotion();
-  const [i, setI] = useState(0);
   const { scrollY } = useScroll();
   const driftA = useTransform(scrollY, [0, 600], [0, 150]);
   const driftB = useTransform(scrollY, [0, 600], [0, 300]);
 
-  useEffect(() => {
-    if (reduce) return;
-    const t = setInterval(() => setI((n) => (n + 1) % WORDS.length), 2600);
-    return () => clearInterval(t);
-  }, [reduce]);
-
   const since = experience[0]?.start;
   const years = since ? yearsSince(since) : 0;
+  // A real figure from the resume: the user roles RentEasify serves (owners to association users).
+  const roles = projects.find((p) => p.id === "renteasify")?.userRoles?.length ?? 0;
 
   return (
     <section className="hero" id="top">
@@ -40,33 +33,19 @@ function Hero() {
           Open to relocation and visa sponsorship
         </motion.p>
         <motion.h1 initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.65, delay: 0.08 }}>
-          Full-stack engineer building{" "}
-          <span className="rotator">
-            <AnimatePresence mode="wait" initial={false}>
-              <motion.em
-                key={WORDS[i]}
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -12 }}
-                transition={{ duration: 0.3 }}
-              >
-                {WORDS[i]}
-              </motion.em>
-            </AnimatePresence>
-          </span>{" "}
-          SaaS.
+          Full-stack engineer. I build the <em>payments, permissions and AI</em> behind multi-tenant SaaS.
         </motion.h1>
         <motion.p className="lead" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.65, delay: 0.16 }}>
-          {years > 0 ? `${years} years` : "Recent experience"} shipping multi-tenant products with Node.js, TypeScript and PostgreSQL, with
-          Gemini, Vertex AI and Pinecone behind the AI features. Based in {profile.location}.
+          {years > 0 ? `${years} years` : "Recent experience"} in production with Node.js, TypeScript and PostgreSQL, with Gemini, Vertex AI and
+          Pinecone behind the AI features. {profile.location}.
         </motion.p>
         <motion.div className="actions" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.65, delay: 0.24 }}>
           <a className="btn btn-primary" href="#work">
-            View projects
+            View work
           </a>
           {HAS_RESUME && (
             <a className="btn" href={RESUME_URL} download>
-              Download resume
+              Download résumé (PDF)
             </a>
           )}
         </motion.div>
@@ -80,10 +59,12 @@ function Hero() {
               <dt>In production since</dt>
               <dd>{since ? formatMonth(since) : "-"}</dd>
             </div>
-            <div className="card">
-              <dt>Focus</dt>
-              <dd className="small">RBAC, payments, multi-tenant</dd>
-            </div>
+            {roles > 0 && (
+              <div className="card">
+                <dt>User roles in RentEasify</dt>
+                <dd>{roles}</dd>
+              </div>
+            )}
           </dl>
         </Reveal>
       </div>
@@ -219,15 +200,20 @@ function Contact() {
       <div className="wrap">
         <Reveal>
           <p className="k">Contact</p>
-          <h2>Let's build something useful.</h2>
+          <h2>Looking for a backend or full-stack role.</h2>
           <p className="lead">
-            I'm looking for backend or full-stack roles, and I'm open to relocation and visa sponsorship. The quickest way to reach me is email.
+            {profile.location}. Open to relocation and visa sponsorship. The quickest way to reach me is email.
           </p>
           <div className="actions">
             <a className="btn btn-primary" href={`mailto:${profile.email}`}>
               {profile.email}
             </a>
             <CopyEmail email={profile.email} />
+            {HAS_RESUME && (
+              <a className="btn" href={RESUME_URL} download>
+                Download résumé (PDF)
+              </a>
+            )}
             <a className="btn" href={profile.linkedin} target="_blank" rel="noreferrer">
               LinkedIn ↗
             </a>
