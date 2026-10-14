@@ -77,6 +77,18 @@ try {
   const body = await r.text();
   const ok = r.status === 200 && /"ok"\s*:\s*true/.test(body);
   line(ok ? "PASS" : "FAIL", "API health", `HTTP ${r.status} in ${secs(performance.now() - t0)}${ok ? "" : ` (if this is a Vercel login page, turn off Deployment Protection for production)`}`);
+  // Newer APIs also report whether their settings are valid, and exactly what is wrong if not.
+  try {
+    const h = JSON.parse(body) as { configured?: boolean; problems?: string[] };
+    if (h.configured === false) {
+      line("FAIL", "API settings are valid", "no. Fix these in the API project's Environment Variables, then redeploy it:");
+      for (const p of h.problems ?? []) console.log(`        - ${p}`);
+    } else if (h.configured === true) {
+      line("PASS", "API settings are valid", "all required settings present");
+    }
+  } catch {
+    /* an older API without this field: the checks below still run */
+  }
 } catch (e) {
   line("FAIL", "API health", `unreachable: ${(e as Error).message}`);
 }

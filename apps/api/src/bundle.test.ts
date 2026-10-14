@@ -48,7 +48,12 @@ test("the bundles are self-contained functions that load and answer", async () =
   try {
     const h = await fetch(`${base}/api/health`);
     assert.equal(h.status, 200);
-    assert.deepEqual(await h.json(), { ok: true });
+    const body = (await h.json()) as { ok: boolean; configured: boolean; problems?: string[] };
+    assert.equal(body.ok, true);
+    // No settings here, so health must say so and name what is missing, without any value.
+    assert.equal(body.configured, false);
+    assert.ok(body.problems?.some((p) => /GEMINI_API_KEY/.test(p)));
+    assert.ok(body.problems?.some((p) => /PINECONE_INDEX/.test(p)));
 
     const c = await fetch(`${base}/api/chat`, { method: "POST", body: '{"message":"hi"}' });
     assert.equal(c.status, 500);
