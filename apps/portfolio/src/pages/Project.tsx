@@ -25,6 +25,9 @@ export default function Project() {
         <p className="k">{project.type}</p>
         <h1 className="page-title">{project.name}</h1>
         <p className="lead">{project.summary}</p>
+        <p className="my-part my-part-lg">
+          <b>My part:</b> {project.myPart}
+        </p>
         <ul className="tags" aria-label="Technology stack">
           {project.stack.map((s) => (
             <li className="tag" key={s}>
