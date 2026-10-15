@@ -1,35 +1,4 @@
-:root {
-  --bg: #fafaf7;
-  --surface: #ffffff;
-  --ink: #14161c;
-  --muted: #5b6070;
-  --line: #e4e4de;
-  --accent: #3340e8;
-  --accent-soft: #e8eaff;
-  --ok: #0f6e56;
-  --ok-soft: #e1f5ee;
-  --warn: #633806;
-  --warn-soft: #faeeda;
-  --blob: #ededfa;
-  --display: "Bricolage Grotesque", "IBM Plex Sans", system-ui, sans-serif;
-  --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --ease: cubic-bezier(0.22, 1, 0.36, 1);
-}
-:root[data-theme="dark"] {
-  --bg: #0e1015;
-  --surface: #151821;
-  --ink: #eceef4;
-  --muted: #9aa0b2;
-  --line: #23262f;
-  --accent: #8e98ff;
-  --accent-soft: #1b1f3a;
-  --ok: #5dcaa5;
-  --ok-soft: #10241e;
-  --warn: #fac775;
-  --warn-soft: #2a2010;
-  --blob: #161a2c;
-}
-
+/* Colours and fonts are generated from src/theme/tokens.ts (the single source of truth). Use var(--name). */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; scroll-padding-top: 84px; -webkit-text-size-adjust: 100%; }
 body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.65; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
@@ -199,8 +168,7 @@ h3 { font-size: 18px; letter-spacing: -0.02em; }
 @keyframes chat-bounce { 50% { transform: translateY(-3px); } }
 .chat-suggest { display: flex; flex-wrap: wrap; gap: 6px; padding: 4px 14px 8px; }
 .chat-suggest .chip { min-height: 44px; padding: 6px 12px; font-size: 13px; text-align: left; border-radius: 12px; }
-.chat-error { min-height: 20px; padding: 0 16px; font-size: 12px; color: #c0392b; }
-:root[data-theme="dark"] .chat-error { color: #f09595; }
+.chat-error { min-height: 20px; padding: 0 16px; font-size: 12px; color: var(--danger); }
 .chat-form { display: flex; gap: 8px; padding: 6px 14px 8px; }
 .chat-form input { flex: 1; min-width: 0; min-height: 44px; padding: 0 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); color: var(--ink); font: inherit; font-size: 14px; }
 .chat-form input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
@@ -220,3 +188,9 @@ h3 { font-size: 18px; letter-spacing: -0.02em; }
 .my-part { margin-top: 8px; font-size: 14px; line-height: 1.55; color: var(--muted); }
 .my-part b { font-weight: 500; color: var(--ink); }
 .my-part-lg { font-size: 16px; margin: -10px 0 18px; max-width: 58ch; }
+
+/* Call-to-action variants (see components/Cta.tsx). Primary and secondary use .btn above. */
+.btn-link { display: inline-flex; align-items: center; gap: 4px; min-height: 44px; padding: 0 4px; border-bottom: 1px solid transparent; color: var(--accent); font-size: 15px; font-weight: 500; text-decoration: none; transition: border-color 0.2s; }
+.btn-link:hover { border-bottom-color: var(--accent); }
+.actions-links { margin-top: 4px; gap: 20px; }
+.contact-address { margin-top: 12px; font-size: 14px; color: var(--muted); user-select: all; }
