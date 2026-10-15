@@ -71,6 +71,7 @@ async function ask(message: string, asOrigin = origin!): Promise<Chat> {
 }
 
 // ---- API ----
+let allowedOrigins: string[] | undefined;
 try {
   const t0 = performance.now();
   const r = await fetch(`${api}/api/health`);
@@ -79,12 +80,13 @@ try {
   line(ok ? "PASS" : "FAIL", "API health", `HTTP ${r.status} in ${secs(performance.now() - t0)}${ok ? "" : ` (if this is a Vercel login page, turn off Deployment Protection for production)`}`);
   // Newer APIs also report whether their settings are valid, and exactly what is wrong if not.
   try {
-    const h = JSON.parse(body) as { configured?: boolean; problems?: string[] };
+    const h = JSON.parse(body) as { configured?: boolean; problems?: string[]; allowedOrigins?: string[] };
     if (h.configured === false) {
       line("FAIL", "API settings are valid", "no. Fix these in the API project's Environment Variables, then redeploy it:");
       for (const p of h.problems ?? []) console.log(`        - ${p}`);
     } else if (h.configured === true) {
       line("PASS", "API settings are valid", "all required settings present");
+      allowedOrigins = h.allowedOrigins;
     }
   } catch {
     /* an older API without this field: the checks below still run */
@@ -99,7 +101,13 @@ try {
     headers: { Origin: origin, "Access-Control-Request-Method": "POST", "Access-Control-Request-Headers": "content-type" },
   }).catch(() => undefined);
   const allow = r?.headers.get("access-control-allow-origin");
-  line(r?.status === 204 && allow === origin ? "PASS" : "FAIL", "CORS preflight from the site", r ? `HTTP ${r.status}, allow-origin=${allow ?? "(none)"}${allow === origin ? "" : `  -> add ${origin} to ALLOWED_ORIGINS and redeploy the API`}` : "no response");
+  const passed = r?.status === 204 && allow === origin;
+  line(passed ? "PASS" : "FAIL", "CORS preflight from the site", r ? `HTTP ${r.status}, allow-origin=${allow ?? "(none)"}${passed ? "" : `  -> add ${origin} to ALLOWED_ORIGINS and redeploy the API`}` : "no response");
+  if (!passed && allowedOrigins) {
+    console.log(`        The API currently allows: ${allowedOrigins.length ? allowedOrigins.join(", ") : "(nothing)"}`);
+    console.log(`        Your site's origin is:    ${origin}`);
+    console.log("        They must match exactly: https, no slash at the end, no quotes, no typo.");
+  }
 }
 
 {

@@ -52,6 +52,7 @@ test("the bundles are self-contained functions that load and answer", async () =
     assert.equal(body.ok, true);
     // No settings here, so health must say so and name what is missing, without any value.
     assert.equal(body.configured, false);
+    assert.ok(Array.isArray(body.problems));
     assert.ok(body.problems?.some((p) => /GEMINI_API_KEY/.test(p)));
     assert.ok(body.problems?.some((p) => /PINECONE_INDEX/.test(p)));
 

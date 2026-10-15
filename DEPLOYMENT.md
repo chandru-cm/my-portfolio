@@ -134,7 +134,7 @@ Then check by eye:
 | Chat button missing on the live site | `VITE_CHAT_ENABLED` not `true`, or you did not redeploy the website after setting it |
 | "Couldn't reach the assistant" | `VITE_API_BASE_URL` wrong or missing, or the API's Deployment Protection is still on |
 | `403 forbidden_origin` in the Network tab | `ALLOWED_ORIGINS` does not exactly match the website address (scheme, host, no trailing slash), or the API was not redeployed after adding it |
-| `500` and "not configured correctly" | A required setting is missing or invalid. Open `https://YOUR-API/api/health`: `"configured": false` lists exactly what to fix, by name only (`npm run smoke` prints the same list). Fix it in the API project's Environment Variables, then **redeploy** the API |
+| `500` and "not configured correctly" | A required setting is missing or invalid. Open `https://YOUR-API/api/health`: `"configured": false` lists exactly what to fix, by name only, and `"configured": true` shows the `allowedOrigins` the API accepts (`npm run smoke` prints both). Fix it in the API project's Environment Variables, then **redeploy** the API |
 | `502 upstream_error` | The Gemini or Pinecone call failed: check keys, model ID, and the Logs line `reason: generate:<status>` or `retrieve:<status>` |
 | `429` for you while testing | You hit the per-minute limit; wait for `Retry-After` seconds |
 | API build log lacks `wrote .vercel/output` | Build Command was overridden in the project settings; clear the override so `vercel.json` applies |
