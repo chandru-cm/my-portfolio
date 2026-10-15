@@ -39,7 +39,9 @@ h3 { font-size: 18px; letter-spacing: -0.02em; }
 .burger { display: none; }
 
 /* Buttons, chips, tags, cards */
-.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 10px 18px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); font-size: 14px; font-weight: 500; text-decoration: none; cursor: pointer; transition: transform 0.2s var(--ease), border-color 0.2s; }
+.btn {
+  font-synthesis: none;
+  text-rendering: optimizeLegibility; display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 10px 18px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); font-size: 14px; font-weight: 500; text-decoration: none; cursor: pointer; transition: transform 0.2s var(--ease), border-color 0.2s; }
 .btn:hover { transform: translateY(-2px); border-color: var(--muted); }
 .btn-primary { background: var(--ink); color: var(--bg); border-color: var(--ink); }
 .btn-primary:hover { border-color: var(--ink); }
