@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import Cta from "../components/Cta";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
 
 export default function NotFound() {
@@ -9,9 +9,9 @@ export default function NotFound() {
         <p className="k">404</p>
         <h1 className="page-title">That page doesn't exist.</h1>
         <p className="lead">The link may be broken, or the page may have moved.</p>
-        <Link className="btn btn-primary" to="/">
+        <Cta kind="page" to="/" variant="primary">
           Back to home
-        </Link>
+        </Cta>
       </div>
     </section>
   );

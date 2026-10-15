@@ -232,3 +232,32 @@ Copy `.env.example` to `.env` and fill in your own keys first. Create the Pineco
 - Ask permission before describing employer-owned products or showing screenshots. Never publish credentials, customer data, private architecture or confidential metrics.
 - Only add metrics that can be substantiated.
 - Test keyboard navigation, reduced motion, phone and tablet layouts, contrast and external links.
+
+---
+
+## 10. Look and feel: theme and buttons
+
+### Theme (one source of truth)
+
+Everything about the site's colours and fonts lives in **`apps/portfolio/src/theme/tokens.ts`**. To change a colour, change it there and nowhere else:
+
+- `tokens.ts` holds the light and dark palettes and the fonts.
+- `vite.config.ts` generates the CSS variables (`virtual:theme.css`) and a tiny boot script from it, so the page, the stylesheet and the browser's address-bar colour cannot drift apart. `styles.css` only ever uses `var(--name)`, never a colour value.
+- `theme.ts` holds the rules: three modes (system, light, dark), what the page should look like, and safe storage. `hooks/useTheme.ts` connects them to React, and `components/ThemeToggle.tsx` is the button. In "system" mode the site follows the visitor's OS setting live.
+- The boot script runs before the first paint, so a dark-mode visitor never sees a white flash.
+- Tests check that both palettes define the same colours and that every text-on-background pair meets WCAG AA contrast (4.5:1) in both themes. Add a new text colour pair to that list when you start using one.
+
+### Buttons and links (one component)
+
+Every call to action uses **`components/Cta.tsx`**, so labels, redirects and accessibility are consistent:
+
+| `kind` | Use for | Behaviour |
+| --- | --- | --- |
+| `section` | scroll to a part of the home page | scrolls in place, even when the address already names the section |
+| `page` | another page of this site | normal navigation |
+| `external` | another website | new tab, `noopener noreferrer`, accessible name says "opens in a new tab" |
+| `download` | a file | download with a file name |
+| `mail` | email | `mailto:` |
+| `action` | something the page does | a real button |
+
+Variants: `primary` (one per block), `secondary`, and `link` (quiet text links).

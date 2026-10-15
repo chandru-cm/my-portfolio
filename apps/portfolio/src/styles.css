@@ -1,35 +1,4 @@
-:root {
-  --bg: #fafaf7;
-  --surface: #ffffff;
-  --ink: #14161c;
-  --muted: #5b6070;
-  --line: #e4e4de;
-  --accent: #3340e8;
-  --accent-soft: #e8eaff;
-  --ok: #0f6e56;
-  --ok-soft: #e1f5ee;
-  --warn: #633806;
-  --warn-soft: #faeeda;
-  --blob: #ededfa;
-  --display: "Bricolage Grotesque", "IBM Plex Sans", system-ui, sans-serif;
-  --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --ease: cubic-bezier(0.22, 1, 0.36, 1);
-}
-:root[data-theme="dark"] {
-  --bg: #0e1015;
-  --surface: #151821;
-  --ink: #eceef4;
-  --muted: #9aa0b2;
-  --line: #23262f;
-  --accent: #8e98ff;
-  --accent-soft: #1b1f3a;
-  --ok: #5dcaa5;
-  --ok-soft: #10241e;
-  --warn: #fac775;
-  --warn-soft: #2a2010;
-  --blob: #161a2c;
-}
-
+/* Colours and fonts are generated from src/theme/tokens.ts (the single source of truth). Use var(--name). */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; scroll-padding-top: 84px; -webkit-text-size-adjust: 100%; }
 body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.65; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
@@ -44,7 +13,7 @@ ul, ol { list-style: none; }
 .small { font-size: 14px; }
 .k { font-size: 12px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
 
-h1, h2, h3 { font-family: var(--display); font-weight: 700; letter-spacing: -0.035em; line-height: 1.12; }
+h1, h2, h3 { font-family: var(--display); font-weight: 700; letter-spacing: -0.025em; line-height: 1.15; }
 h1 { font-size: clamp(34px, 6vw, 62px); max-width: 16ch; }
 h2 { font-size: clamp(26px, 3.6vw, 38px); margin-bottom: 12px; }
 h3 { font-size: 18px; letter-spacing: -0.02em; }
@@ -70,7 +39,9 @@ h3 { font-size: 18px; letter-spacing: -0.02em; }
 .burger { display: none; }
 
 /* Buttons, chips, tags, cards */
-.btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 18px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); font-size: 14px; font-weight: 500; text-decoration: none; cursor: pointer; transition: transform 0.2s var(--ease), border-color 0.2s; }
+.btn {
+  font-synthesis: none;
+  text-rendering: optimizeLegibility; display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 10px 18px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); font-size: 14px; font-weight: 500; text-decoration: none; cursor: pointer; transition: transform 0.2s var(--ease), border-color 0.2s; }
 .btn:hover { transform: translateY(-2px); border-color: var(--muted); }
 .btn-primary { background: var(--ink); color: var(--bg); border-color: var(--ink); }
 .btn-primary:hover { border-color: var(--ink); }
@@ -130,7 +101,7 @@ h3 { font-size: 18px; letter-spacing: -0.02em; }
 .next a { color: var(--accent); text-decoration: none; font-weight: 500; display: inline-block; min-height: 44px; line-height: 44px; }
 
 /* Flow diagram */
-.flow { display: flex; flex-wrap: wrap; align-items: center; margin: 14px 0 18px; }
+.flow { display: flex; flex-wrap: wrap; align-items: center; row-gap: 12px; margin: 14px 0 18px; }
 .flow-step { display: flex; align-items: center; }
 .flow-node { padding: 8px 14px; border: 1px solid var(--accent); border-radius: 10px; background: var(--accent-soft); font-size: 14px; }
 .flow-link { --p: 0; display: block; width: 34px; height: 2px; background: var(--line); position: relative; overflow: hidden; }
@@ -161,7 +132,7 @@ h3 { font-size: 18px; letter-spacing: -0.02em; }
   .nav nav.open { display: flex; }
   .nav nav a { min-height: 48px; display: flex; align-items: center; border-bottom: 1px solid var(--line); font-size: 16px; }
   .blob-a { width: 180px; height: 180px; }
-  .flow { flex-direction: column; align-items: stretch; }
+  .flow { flex-direction: column; align-items: stretch; row-gap: 0; }
   .flow-step { flex-direction: column; align-items: flex-start; }
   .flow-link { width: 2px; height: 22px; margin-left: 22px; }
   .flow-link::after { transform: scaleY(var(--p)); transform-origin: top; }
@@ -199,8 +170,7 @@ h3 { font-size: 18px; letter-spacing: -0.02em; }
 @keyframes chat-bounce { 50% { transform: translateY(-3px); } }
 .chat-suggest { display: flex; flex-wrap: wrap; gap: 6px; padding: 4px 14px 8px; }
 .chat-suggest .chip { min-height: 44px; padding: 6px 12px; font-size: 13px; text-align: left; border-radius: 12px; }
-.chat-error { min-height: 20px; padding: 0 16px; font-size: 12px; color: #c0392b; }
-:root[data-theme="dark"] .chat-error { color: #f09595; }
+.chat-error { min-height: 20px; padding: 0 16px; font-size: 12px; color: var(--danger); }
 .chat-form { display: flex; gap: 8px; padding: 6px 14px 8px; }
 .chat-form input { flex: 1; min-width: 0; min-height: 44px; padding: 0 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); color: var(--ink); font: inherit; font-size: 14px; }
 .chat-form input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
@@ -220,3 +190,9 @@ h3 { font-size: 18px; letter-spacing: -0.02em; }
 .my-part { margin-top: 8px; font-size: 14px; line-height: 1.55; color: var(--muted); }
 .my-part b { font-weight: 500; color: var(--ink); }
 .my-part-lg { font-size: 16px; margin: -10px 0 18px; max-width: 58ch; }
+
+/* Call-to-action variants (see components/Cta.tsx). Primary and secondary use .btn above. */
+.btn-link { display: inline-flex; align-items: center; gap: 4px; min-height: 44px; padding: 0 4px; border-bottom: 1px solid transparent; color: var(--accent); font-size: 15px; font-weight: 500; text-decoration: none; transition: border-color 0.2s; }
+.btn-link:hover { border-bottom-color: var(--accent); }
+.actions-links { margin-top: 4px; gap: 20px; }
+.contact-address { margin-top: 12px; font-size: 14px; color: var(--muted); user-select: all; }

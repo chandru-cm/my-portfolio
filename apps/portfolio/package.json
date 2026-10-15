@@ -10,6 +10,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@fontsource/inter": "^5.3.0",
     "@my-portfolio/content": "^1.0.0",
     "framer-motion": "^11.11.17",
     "react": "^18.3.1",
@@ -21,6 +22,7 @@
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.3.4",
+    "esbuild": "^0.21.5",
     "typescript": "^5.6.3",
     "vite": "^5.4.11"
   }
