@@ -9,11 +9,11 @@ export default function Footer() {
           © {new Date().getFullYear()} {profile.name}
         </span>
         <span>
-          <a href={profile.linkedin} target="_blank" rel="noreferrer">
+          <a href={profile.linkedin} target="_blank" rel="noopener noreferrer" aria-label={`${profile.name} on LinkedIn (opens in a new tab)`}>
             LinkedIn
           </a>
           {" · "}
-          <a href={profile.github} target="_blank" rel="noreferrer">
+          <a href={profile.github} target="_blank" rel="noopener noreferrer" aria-label={`${profile.name} on GitHub (opens in a new tab)`}>
             GitHub
           </a>
           {" · "}

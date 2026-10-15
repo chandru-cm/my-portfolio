@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { motion, type Variants } from "framer-motion";
+import Cta from "./Cta";
 
 const list: Variants = {
   hidden: {},
@@ -38,9 +39,9 @@ export default function FlowDiagram({ steps }: Props) {
           </motion.li>
         ))}
       </motion.ol>
-      <button className="btn" type="button" onClick={() => setRun((r) => r + 1)}>
+      <Cta kind="action" onClick={() => setRun((r) => r + 1)}>
         Replay animation
-      </button>
+      </Cta>
     </div>
   );
 }

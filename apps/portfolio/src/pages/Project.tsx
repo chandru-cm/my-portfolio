@@ -1,5 +1,6 @@
 import { Link, useParams } from "react-router-dom";
 import { projects } from "@my-portfolio/content";
+import Cta from "../components/Cta";
 import FlowDiagram from "../components/FlowDiagram";
 import Reveal from "../components/Reveal";
 import { caseStudyFor, hostOf } from "../lib/site";
@@ -37,9 +38,9 @@ export default function Project() {
         </ul>
         <div className="actions">
           {project.liveUrls.map((u) => (
-            <a className="btn" key={u} href={u} target="_blank" rel="noreferrer">
-              {hostOf(u)} ↗
-            </a>
+            <Cta kind="external" key={u} href={u} label={`${project.name} live site, ${hostOf(u)}`}>
+              {hostOf(u)}
+            </Cta>
           ))}
         </div>
 

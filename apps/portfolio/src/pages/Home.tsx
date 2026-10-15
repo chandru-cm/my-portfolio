@@ -2,6 +2,7 @@ import { useState } from "react";
 import { AnimatePresence, motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import { education, experience, profile, projects, skills, type Category } from "@my-portfolio/content";
 import CopyEmail from "../components/CopyEmail";
+import Cta from "../components/Cta";
 import ProjectCard from "../components/ProjectCard";
 import Reveal from "../components/Reveal";
 import { HAS_RESUME, RESUME_URL, formatMonth, yearsSince } from "../lib/site";
@@ -40,13 +41,13 @@ function Hero() {
           Pinecone behind the AI features. {profile.location}.
         </motion.p>
         <motion.div className="actions" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.65, delay: 0.24 }}>
-          <a className="btn btn-primary" href="#work">
+          <Cta kind="section" to="work" variant="primary">
             View work
-          </a>
+          </Cta>
           {HAS_RESUME && (
-            <a className="btn" href={RESUME_URL} download>
+            <Cta kind="download" href={RESUME_URL} fileName="Chandra_Moorthy_Resume.pdf">
               Download résumé (PDF)
-            </a>
+            </Cta>
           )}
         </motion.div>
         <Reveal delay={0.1}>
@@ -205,21 +206,24 @@ function Contact() {
             {profile.location}. Open to relocation and visa sponsorship. The quickest way to reach me is email.
           </p>
           <div className="actions">
-            <a className="btn btn-primary" href={`mailto:${profile.email}`}>
-              {profile.email}
-            </a>
+            <Cta kind="mail" email={profile.email} variant="primary">
+              Email me
+            </Cta>
             <CopyEmail email={profile.email} />
             {HAS_RESUME && (
-              <a className="btn" href={RESUME_URL} download>
+              <Cta kind="download" href={RESUME_URL} fileName="Chandra_Moorthy_Resume.pdf">
                 Download résumé (PDF)
-              </a>
+              </Cta>
             )}
-            <a className="btn" href={profile.linkedin} target="_blank" rel="noreferrer">
-              LinkedIn ↗
-            </a>
-            <a className="btn" href={profile.github} target="_blank" rel="noreferrer">
-              GitHub ↗
-            </a>
+          </div>
+          <p className="contact-address">{profile.email}</p>
+          <div className="actions actions-links">
+            <Cta kind="external" href={profile.linkedin} label={`${profile.name} on LinkedIn`} variant="link">
+              LinkedIn
+            </Cta>
+            <Cta kind="external" href={profile.github} label={`${profile.name} on GitHub`} variant="link">
+              GitHub
+            </Cta>
           </div>
         </Reveal>
       </div>

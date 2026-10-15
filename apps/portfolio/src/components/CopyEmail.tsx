@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import Cta from "./Cta";
 
 type Props = { email: string };
 
@@ -36,9 +37,9 @@ export default function CopyEmail({ email }: Props) {
 
   return (
     <>
-      <button className="btn" type="button" onClick={copy}>
+      <Cta kind="action" onClick={copy}>
         {state === "copied" ? "Copied" : state === "failed" ? "Press Ctrl+C to copy" : "Copy email"}
-      </button>
+      </Cta>
       <span className="sr-only" role="status">
         {state === "copied" ? "Email address copied to the clipboard" : state === "failed" ? "Could not copy. Select the address and copy it manually." : ""}
       </span>
