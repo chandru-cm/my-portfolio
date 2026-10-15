@@ -34,8 +34,10 @@ export default function FlowDiagram({ steps }: Props) {
       >
         {steps.map((step, i) => (
           <motion.li className="flow-step" key={step} variants={node}>
+            {/* The connector comes before its node, so when a long flow wraps it travels with the node
+                instead of leaving a dangling line at the end of the previous row. */}
+            {i > 0 && <motion.span className="flow-link" aria-hidden="true" variants={link} />}
             <span className="flow-node">{step}</span>
-            {i < steps.length - 1 && <motion.span className="flow-link" aria-hidden="true" variants={link} />}
           </motion.li>
         ))}
       </motion.ol>
