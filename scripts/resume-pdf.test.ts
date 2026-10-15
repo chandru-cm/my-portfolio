@@ -15,7 +15,7 @@ async function render() {
 test("a real font is embedded, so the PDF does not depend on the viewer's fonts", async () => {
   const { bytes } = await render();
   assert.ok(bytes.startsWith("%PDF"));
-  assert.match(bytes, /\/BaseFont \/[A-Z]{6}\+IBMPlexSans/, "an IBM Plex Sans subset must be embedded");
+  assert.match(bytes, /\/BaseFont \/[A-Z]{6}\+Inter/, "an Inter subset must be embedded");
   assert.doesNotMatch(bytes, /\/BaseFont \/Helvetica/, "the unembedded built-in font must not be used");
   assert.match(bytes, /\/FontFile/, "the font program itself must be in the file");
 });

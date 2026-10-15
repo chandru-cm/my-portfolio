@@ -42,8 +42,8 @@ export const palette: Record<ThemeName, Record<string, string>> = {
 
 /** Not colour-dependent, so identical in both themes. */
 export const shared: Record<string, string> = {
-  display: '"Bricolage Grotesque", "IBM Plex Sans", system-ui, sans-serif',
-  body: '"IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif',
+  display: '"Inter", system-ui, sans-serif',
+  body: '"Inter", system-ui, -apple-system, "Segoe UI", sans-serif',
   ease: "cubic-bezier(0.22, 1, 0.36, 1)",
 };
 

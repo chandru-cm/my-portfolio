@@ -5,11 +5,11 @@ import { resolve } from "node:path";
 
 export const PRODUCER = "my-portfolio resume generator";
 
-// IBM Plex Sans (SIL Open Font License) is embedded in the PDF, so it renders identically in every
+// Inter (SIL Open Font License) is embedded in the PDF, so it renders identically in every
 // viewer, on phones and in applicant-tracking text parsers. The built-in PDF fonts are NOT embedded:
 // each viewer swaps in its own, and spacing and accents can come out wrong.
-const FONT_DIR = resolve(import.meta.dirname, "../node_modules/@fontsource/ibm-plex-sans/files");
-const fontFile = (weight: 400 | 600, style: "normal" | "italic") => resolve(FONT_DIR, `ibm-plex-sans-latin-${weight}-${style}.woff`);
+const FONT_DIR = resolve(import.meta.dirname, "../node_modules/@fontsource/inter/files");
+const fontFile = (weight: 400 | 600, style: "normal" | "italic") => resolve(FONT_DIR, `inter-latin-${weight}-${style}.woff`);
 
 const INK = "#14161C";
 const MUTED = "#5B6070";
