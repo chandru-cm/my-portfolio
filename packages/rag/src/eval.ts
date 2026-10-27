@@ -9,6 +9,8 @@ export type EvalCase = {
   expectDocPrefixes?: string[];
   /** Must be refused by the deterministic private-details guard before retrieval. */
   expectPrivateRefusal?: boolean;
+  /** Must be answered by a fixed reply (greeting, thanks, help, compensation) without retrieval. */
+  expectRoute?: "greeting" | "thanks" | "help" | "compensation";
   /** Out of scope: nothing should clear the similarity threshold. */
   expectUnanswerable?: boolean;
   /** No retrieved chunk may come from these docs (for example unapproved case studies). */
@@ -33,7 +35,15 @@ export const EVAL_CASES: EvalCase[] = [
   { id: "live-sites", question: "Which products have live websites I can visit?", expectDocPrefixes: ["project:"] },
   { id: "roles", question: "What kind of roles is Chandra Moorthy looking for?", expectDocPrefixes: ["faq-roles", "profile"] },
   { id: "phone", question: "What is Chandra Moorthy's phone number?", expectPrivateRefusal: true },
-  { id: "salary", question: "What salary does Chandra Moorthy expect?", expectPrivateRefusal: true },
+  { id: "salary", question: "What salary does Chandra Moorthy expect?", expectRoute: "compensation" },
+  { id: "rate", question: "What is your hourly rate?", expectRoute: "compensation" },
+  { id: "hello", question: "Hello", expectRoute: "greeting" },
+  { id: "thanks", question: "Thank you!", expectRoute: "thanks" },
+  { id: "help", question: "What can you do?", expectRoute: "help" },
+  { id: "about", question: "Who is Chandra Moorthy?", expectDocPrefixes: ["faq-about", "profile"] },
+  { id: "style", question: "How does Chandra Moorthy like to work?", expectDocPrefixes: ["faq-working-style", "faq-remote"] },
+  { id: "interview", question: "How can I schedule an interview with Chandra Moorthy?", expectDocPrefixes: ["faq-interview", "faq-contact"] },
+  { id: "strengths", question: "What are the strongest skills?", expectDocPrefixes: ["faq-strengths", "skills"] },
   { id: "python", question: "Write a Python function that sorts a list", expectUnanswerable: true },
   { id: "cricket", question: "Who won the cricket world cup?", expectUnanswerable: true },
   { id: "capital", question: "What is the capital of France?", expectUnanswerable: true },
@@ -76,13 +86,18 @@ export async function runEval(
   for (const c of cases) {
     const route = routeQuestion(c.question);
 
+    if (c.expectRoute) {
+      const ok = route.kind === c.expectRoute;
+      results.push({ id: c.id, passed: ok, detail: ok ? `fixed ${c.expectRoute} reply, no retrieval` : `routed to ${route.kind}` });
+      continue;
+    }
     if (c.expectPrivateRefusal) {
       const ok = route.kind === "refuse-private";
       results.push({ id: c.id, passed: ok, detail: ok ? "refused before retrieval" : "was NOT refused" });
       continue;
     }
-    if (route.kind === "refuse-private") {
-      results.push({ id: c.id, passed: false, detail: "wrongly refused as private" });
+    if (route.kind !== "search") {
+      results.push({ id: c.id, passed: false, detail: `wrongly routed to ${route.kind} instead of search` });
       continue;
     }
 

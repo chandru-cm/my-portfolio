@@ -3,7 +3,11 @@ import { profile } from "@my-portfolio/content";
 import { CHAT_ENDPOINT } from "../lib/site";
 import { SseParser } from "../lib/sse";
 
-export const MAX_QUESTIONS = 5;
+/**
+ * Questions that use the model or search. Greetings, thanks, help and salary replies do not count, so this
+ * can be generous while the model quota is still protected server-side.
+ */
+export const MAX_QUESTIONS = 10;
 export const MAX_QUESTION_CHARS = 300;
 const HISTORY_TURNS = 6;
 
@@ -15,6 +19,10 @@ export type ChatMessage = {
   text: string;
   kind?: MessageKind;
   sources?: string[];
+  /** One-tap follow-up questions offered with a reply. */
+  suggestions?: string[];
+  /** A call to action with a reply, such as an email that already has the questions to answer. */
+  action?: { label: string; href: string };
   /** False while the answer is still being produced. */
   done: boolean;
 };
@@ -110,9 +118,22 @@ export function useChat(endpoint = CHAT_ENDPOINT) {
           const { done, value } = await reader.read();
           if (done) break;
           for (const { event, data } of parser.push(decoder.decode(value, { stream: true }))) {
-            const d = data as { kind?: MessageKind; sources?: string[]; text?: string; message?: string };
+            const d = data as {
+              kind?: MessageKind;
+              sources?: string[];
+              text?: string;
+              message?: string;
+              counted?: boolean;
+              suggestions?: string[];
+              action?: { label: string; href: string };
+            };
             if (event === "meta") {
-              patch(replyId, (m) => ({ ...m, kind: d.kind ?? "answer", sources: d.sources ?? [] }));
+              // Quick replies do not count: give the question back so only real searches use up the limit.
+              if (d.counted === false) {
+                askedRef.current = Math.max(0, askedRef.current - 1);
+                setAsked(askedRef.current);
+              }
+              patch(replyId, (m) => ({ ...m, kind: d.kind ?? "answer", sources: d.sources ?? [], suggestions: d.suggestions, action: d.action }));
             } else if (event === "token") {
               setBusy("streaming");
               patch(replyId, (m) => ({ ...m, text: m.text + (d.text ?? "") }));

@@ -91,4 +91,52 @@ export const faq: Faq[] = [
     answer:
       "TypeScript and Node.js with Express on Firebase Functions, PostgreSQL (Prisma) or Firestore for data, React Native with Expo and Flutter for mobile, React and Angular for web, Razorpay for payments and Google Gemini for AI features.",
   },
+  {
+    id: "faq-about",
+    question: "Who is Chandra Moorthy? Tell me about you, about yourself.",
+    answer:
+      "Chandra Moorthy is a full-stack developer in Chennai, India, with about two years of professional experience since October 2024 at Tamilarasi Technologies. They build multi-tenant SaaS products end to end with Node.js, TypeScript, PostgreSQL or Firestore, React Native and Flutter, and have worked on four live products: RentEasify, SociBooks, DigiVCards.ai and Kalaivani ERP.",
+  },
+  {
+    id: "faq-strengths",
+    question: "What are Chandra Moorthy's strongest skills?",
+    answer:
+      "Node.js and TypeScript APIs, multi-tenant data access with role-based permissions, Razorpay payment flows, and mobile apps in React Native, Expo and Flutter. Chandra Moorthy also builds AI features with Google Gemini, such as scanning a paper visiting card into a digital card.",
+  },
+  {
+    id: "faq-working-style",
+    question: "How does Chandra Moorthy like to work?",
+    answer:
+      "Chandra Moorthy is open to on-site, hybrid or remote work and works IST 10:00 to 19:00. Email is the best way to reach them and replies come within 24 hours. On every product they have worked in a team of several engineers, owning features from the data model and API through to the mobile or web screen and deployment.",
+  },
+  {
+    id: "faq-remote",
+    question: "Can Chandra Moorthy work remotely with a team abroad?",
+    answer:
+      "Yes. Chandra Moorthy is based in Chennai (UTC+5:30). The working day covers the whole morning in Central Europe and most of the morning in the United Kingdom; overlap with US Eastern time is very limited. The time-zone table on the portfolio shows the overlap for today's date.",
+  },
+  {
+    id: "faq-compensation",
+    question: "What are Chandra Moorthy's salary or rate expectations?",
+    answer:
+      "Chandra Moorthy discusses compensation directly, because it depends on the role, scope, location and type of engagement. Send the role, your working style and your budget by email and expect a reply within 24 hours.",
+  },
+  {
+    id: "faq-interview",
+    question: "How can I schedule an interview or call with Chandra Moorthy?",
+    answer:
+      "Email Chandra Moorthy with the role, a few proposed times and your time zone. Working hours are IST 10:00 to 19:00 and replies come within 24 hours.",
+  },
+  {
+    id: "faq-personal",
+    question: "Can I ask Chandra Moorthy personal questions through this assistant?",
+    answer:
+      "This assistant covers professional topics only: projects, skills, experience, availability and ways of working. For anything personal or not covered here, email Chandra Moorthy directly.",
+  },
+  {
+    id: "faq-assistant",
+    question: "Who built this assistant, and what AI does it use? How do you work?",
+    answer:
+      "Chandra Moorthy built this assistant for the portfolio. It is an AI assistant that uses Google Gemini and a search index of the approved portfolio content. It answers only from the projects, skills, experience and availability on this site, does not store your questions, and says so when it does not know something.",
+  },
 ];

@@ -1,10 +1,19 @@
 import { profile } from "@my-portfolio/content";
 import {
   buildPrompt,
+  COMPENSATION_REPLY,
+  CONTACT_EMAIL,
+  EmailScrubber,
+  enquiryAction,
+  GREETING_REPLY,
+  HELP_REPLY,
   PRIVATE_REFUSAL,
   retrieve,
   routeQuestion,
+  searchQuery,
   sourcesOf,
+  SUGGESTED_QUESTIONS,
+  THANKS_REPLY,
   UNKNOWN_ANSWER,
   validateQuestion,
   type Embedder,
@@ -12,6 +21,7 @@ import {
   type Turn,
   type VectorStore,
 } from "@my-portfolio/rag";
+import type { AnswerCache } from "./cache";
 import type { HandlerConfig } from "./config";
 import { clientIp, corsHeaders, isOriginAllowed, jsonError, sseEvent, sseResponse } from "./http";
 import type { RateLimiter } from "./limiter";
@@ -24,6 +34,8 @@ export type ChatDeps = {
   store: VectorStore;
   generator: Generator;
   limits: { perMinute: RateLimiter; perDay: RateLimiter; global: RateLimiter };
+  /** Recent model answers, replayed for repeat questions. Optional: without it every question asks the model. */
+  cache?: AnswerCache;
   /** Receives status, kind and latency only. Never the question text. */
   log?: (event: LogEvent) => void;
 };
@@ -126,33 +138,46 @@ async function run(
   const history = parsed.history.slice(-6);
 
   const ip = clientIp(request.headers);
-  const checks: [RateLimiter, string][] = [
-    [deps.limits.perMinute, ip],
-    [deps.limits.perDay, ip],
-    [deps.limits.global, "global"],
-  ];
-  for (const [limiter, key] of checks) {
-    const result = await limiter.check(key);
-    if (!result.allowed) {
-      return finish(
-        jsonError(
-          429,
-          "rate_limited",
-          `Too many questions right now. Try again shortly, or email ${profile.email}.`,
-          { ...cors, "Retry-After": String(result.retryAfterSec) }
-        ),
-        undefined,
-        "rate_limited"
-      );
+  // Every request counts against the per-minute limit. The daily and global limits protect the free
+  // Gemini quota, so they are charged only when a request is about to use it (see useQuota below).
+  const limited = async (checks: [RateLimiter, string][]): Promise<Response | null> => {
+    for (const [limiter, key] of checks) {
+      const result = await limiter.check(key);
+      if (!result.allowed) {
+        return finish(
+          jsonError(
+            429,
+            "rate_limited",
+            `Too many questions right now. Try again shortly, or email ${profile.email}.`,
+            { ...cors, "Retry-After": String(result.retryAfterSec) }
+          ),
+          undefined,
+          "rate_limited"
+        );
+      }
     }
-  }
+    return null;
+  };
+  const tooFast = await limited([[deps.limits.perMinute, ip]]);
+  if (tooFast) return tooFast;
+  const useQuota = () =>
+    limited([
+      [deps.limits.perDay, ip],
+      [deps.limits.global, "global"],
+    ]);
 
-  const fixed = (kind: "refusal" | "unknown" | "answer", answer: string, sources: string[] = [], logKind: string = kind) =>
+  const fixed = (
+    kind: "refusal" | "unknown" | "answer",
+    answer: string,
+    sources: string[] = [],
+    logKind: string = kind,
+    extra: { suggestions?: string[]; action?: { label: string; href: string }; counted?: boolean } = {}
+  ) =>
     finish(
       sseResponse(
         new ReadableStream<Uint8Array>({
           start(controller) {
-            controller.enqueue(sseEvent("meta", { kind, sources }));
+            controller.enqueue(sseEvent("meta", { kind, sources, counted: false, ...extra }));
             controller.enqueue(sseEvent("token", { text: answer }));
             controller.enqueue(sseEvent("done", {}));
             controller.close();
@@ -163,26 +188,45 @@ async function run(
       logKind
     );
 
-  if (routeQuestion(question).kind === "refuse-private") return fixed("refusal", PRIVATE_REFUSAL);
+  switch (routeQuestion(question).kind) {
+    case "refuse-private":
+      return fixed("refusal", PRIVATE_REFUSAL, [], "refusal");
+    case "compensation":
+      return fixed("answer", COMPENSATION_REPLY, [], "compensation", { action: enquiryAction() });
+    case "greeting":
+      return fixed("answer", GREETING_REPLY, [], "greeting", { suggestions: SUGGESTED_QUESTIONS });
+    case "thanks":
+      return fixed("answer", THANKS_REPLY, [], "thanks", { suggestions: SUGGESTED_QUESTIONS });
+    case "help":
+      return fixed("answer", HELP_REPLY, [], "help", { suggestions: SUGGESTED_QUESTIONS });
+  }
 
+  // Repeat of a recent question with no conversation behind it: replay the stored answer.
+  const cached = history.length === 0 ? deps.cache?.get(question) : undefined;
+  if (cached) return fixed("answer", cached.text, cached.sources, "cache", { counted: true });
+
+  const overQuota = await useQuota();
+  if (overQuota) return overQuota;
+
+  const search = searchQuery(question, history);
   let retrieval;
   try {
-    retrieval = await retrieve(question, deps.embedder, deps.store, {
+    retrieval = await retrieve(search.text, deps.embedder, deps.store, {
       topK: config.topK,
       threshold: config.threshold,
     });
   } catch (error) {
     return finish(jsonError(502, "upstream_error", "The assistant is unavailable right now.", cors), undefined, upstream("retrieve", error));
   }
-  if (!retrieval.answerable) return fixed("unknown", UNKNOWN_ANSWER);
+  if (!retrieval.answerable) return fixed("unknown", UNKNOWN_ANSWER, [], "unknown", { suggestions: SUGGESTED_QUESTIONS, counted: true });
 
   // Instant path: a close match to an approved FAQ is answered with its stored text. No model
   // call, so no wait and no quota used. The text is the owner-approved answer, never generated.
   const top = retrieval.matches[0];
-  if (top && top.metadata.docId.startsWith("faq-") && top.score >= config.faqFastPathThreshold) {
+  if (!search.followUp && top && top.metadata.docId.startsWith("faq-") && top.score >= config.faqFastPathThreshold) {
     const { title, text } = top.metadata;
     const answer = text.startsWith(title) ? text.slice(title.length).trim() : text;
-    return fixed("answer", answer, [title], "faq");
+    return fixed("answer", answer, [title], "faq", { counted: true });
   }
 
   const prompt = buildPrompt({ question, history, context: retrieval.context });
@@ -200,20 +244,40 @@ async function run(
     return finish(jsonError(502, "upstream_error", "The assistant returned no answer.", cors), undefined, "empty");
   }
 
+  let collected = "";
+  // A model can invent a contact address. Every address in its text is checked against the real one.
+  const scrub = new EmailScrubber(CONTACT_EMAIL);
   const stream = new ReadableStream<Uint8Array>({
     start(controller) {
-      controller.enqueue(sseEvent("meta", { kind: "answer", sources }));
-      controller.enqueue(sseEvent("token", { text: first.value }));
+      controller.enqueue(sseEvent("meta", { kind: "answer", sources, counted: true }));
+      const firstText = scrub.push(first.value);
+      if (firstText) controller.enqueue(sseEvent("token", { text: firstText }));
+      collected = firstText;
     },
     async pull(controller) {
       try {
-        const next = await iterator.next();
-        if (next.done) {
-          controller.enqueue(sseEvent("done", {}));
-          controller.close();
-          return;
+        // Keep reading until there is something to send: a fragment that ends mid-word is held back
+        // by the scrubber, and a pull that sends nothing would never be called again.
+        for (;;) {
+          const next = await iterator.next();
+          if (next.done) {
+            const rest = scrub.flush();
+            if (rest) {
+              collected += rest;
+              controller.enqueue(sseEvent("token", { text: rest }));
+            }
+            if (history.length === 0 && !/^I don't have that information/i.test(collected)) deps.cache?.set(question, { text: collected, sources });
+            controller.enqueue(sseEvent("done", {}));
+            controller.close();
+            return;
+          }
+          const text = scrub.push(next.value);
+          if (text) {
+            collected += text;
+            controller.enqueue(sseEvent("token", { text }));
+            return;
+          }
         }
-        controller.enqueue(sseEvent("token", { text: next.value }));
       } catch {
         controller.enqueue(
           sseEvent("error", { code: "upstream_error", message: "The answer was interrupted. Please try again." })

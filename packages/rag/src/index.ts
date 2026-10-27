@@ -6,8 +6,16 @@ export { LexicalEmbedder } from "./lexicalEmbedder";
 export { withRetry, isTransientHttpError } from "./retry";
 export {
   MAX_QUESTION_CHARS,
+  CONTACT_EMAIL,
   PRIVATE_REFUSAL,
   UNKNOWN_ANSWER,
+  GREETING_REPLY,
+  THANKS_REPLY,
+  HELP_REPLY,
+  COMPENSATION_REPLY,
+  SUGGESTED_QUESTIONS,
+  enquiryAction,
+  type ReplyAction,
   validateQuestion,
   routeQuestion,
   type Route,
@@ -21,3 +29,5 @@ export type { Generator } from "./generator";
 export { GeminiEmbedder, DEFAULT_EMBEDDING_MODEL, type GeminiEmbedderOptions } from "./adapters/gemini";
 export { GeminiGenerator, type GeminiGeneratorOptions } from "./adapters/geminiGenerator";
 export { PineconeStore, type PineconeStoreOptions } from "./adapters/pinecone";
+export { searchQuery, type SearchQuery } from "./followup";
+export { EmailScrubber, scrubEmails } from "./scrub";

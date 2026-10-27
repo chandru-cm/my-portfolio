@@ -6,10 +6,13 @@ import { linkify } from "../lib/linkify";
 
 const SUGGESTIONS = [
   `What is ${profile.name}'s tech stack?`,
-  `Does ${profile.name} need visa sponsorship?`,
-  `What did ${profile.name} build on RentEasify?`,
+  `Is ${profile.name} open to remote or relocation roles?`,
   `Which time zones can ${profile.name} work with?`,
+  `What did ${profile.name} build on RentEasify?`,
 ];
+
+/** A model answer that says it has nothing on the topic should not list sources as if it did. */
+const DECLINES = /^I don't have that information/i;
 
 const SPARK = "M12 2c.4 4.6 2.4 6.9 7 7.4v.2c-4.6.5-6.6 2.8-7 7.4h-.2c-.4-4.6-2.4-6.9-7-7.4v-.2c4.6-.5 6.6-2.8 7-7.4z";
 
@@ -55,14 +58,28 @@ function Thinking() {
   );
 }
 
-function Bubble({ m }: { m: ChatMessage }) {
+function Bubble({ m, onAsk, busy }: { m: ChatMessage; onAsk: (q: string) => void; busy: boolean }) {
   if (m.role === "user") return <div className="msg msg-user">{m.text}</div>;
   const tone = m.kind === "unknown" || m.kind === "refusal" || m.kind === "error" ? " msg-note" : "";
   return (
     <div className={`msg msg-bot${tone}`}>
       {m.text ? <span className="msg-text"><Linked text={m.text} /></span> : <Thinking />}
-      {m.done && m.kind === "answer" && m.sources && m.sources.length > 0 && (
+      {m.done && m.kind === "answer" && !DECLINES.test(m.text) && m.sources && m.sources.length > 0 && (
         <p className="msg-sources">Sources: {m.sources.join(" · ")}</p>
+      )}
+      {m.done && m.action && (
+        <a className="btn btn-primary chat-action" href={m.action.href}>
+          {m.action.label}
+        </a>
+      )}
+      {m.done && m.suggestions && m.suggestions.length > 0 && (
+        <div className="chat-suggest chat-suggest-inline">
+          {m.suggestions.map((q) => (
+            <button key={q} type="button" className="chip" disabled={busy} onClick={() => onAsk(q)}>
+              {q}
+            </button>
+          ))}
+        </div>
       )}
     </div>
   );
@@ -160,7 +177,7 @@ export default function ChatWidget() {
                 Hi, I can answer questions about {profile.name}'s experience, projects, skills and availability. What would you like to know?
               </div>
               {messages.map((m) => (
-                <Bubble key={m.id} m={m} />
+                <Bubble key={m.id} m={m} busy={busy} onAsk={(q) => void submit(q)} />
               ))}
             </div>
 
@@ -198,7 +215,7 @@ export default function ChatWidget() {
               </button>
             </form>
             <p className="chat-foot">
-              {remaining} question{remaining === 1 ? "" : "s"} left in this session. AI-generated from {profile.name}'s profile. This site does not store your questions.
+              {remaining} question{remaining === 1 ? "" : "s"} left in this session. Greetings and quick replies do not count. AI-generated from {profile.name}'s profile. This site does not store your questions.
             </p>
           </motion.section>
         )}
