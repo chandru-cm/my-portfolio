@@ -26,8 +26,9 @@ export const EVAL_CASES: EvalCase[] = [
   { id: "databases", question: "Which databases and backend technologies are used?", expectDocPrefixes: ["skills"] },
   // faq-experience also names the employer, so either document answers this.
   { id: "employer", question: "Where does Chandra Moorthy currently work?", expectDocPrefixes: ["experience:", "faq-experience"] },
-  { id: "docker", question: "Does Chandra Moorthy know Docker?", expectDocPrefixes: ["skills"] },
-  { id: "pinecone", question: "What has Chandra Moorthy done with Pinecone?", expectDocPrefixes: ["experience:", "faq-ai", "skills"] },
+  { id: "flutter", question: "Does Chandra Moorthy know Flutter?", expectDocPrefixes: ["skills", "project:"] },
+  { id: "payments", question: "What has Chandra Moorthy done with Razorpay payments?", expectDocPrefixes: ["experience:", "project:", "skills"] },
+  { id: "timezone", question: "Which time zones can Chandra Moorthy work with?", expectDocPrefixes: ["faq-timezone", "profile"] },
   { id: "contact", question: "How can I contact Chandra Moorthy?", expectDocPrefixes: ["faq-contact"] },
   { id: "live-sites", question: "Which products have live websites I can visit?", expectDocPrefixes: ["project:"] },
   { id: "roles", question: "What kind of roles is Chandra Moorthy looking for?", expectDocPrefixes: ["faq-roles", "profile"] },

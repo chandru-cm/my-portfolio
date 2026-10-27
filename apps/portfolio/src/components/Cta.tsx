@@ -56,8 +56,17 @@ export default function Cta(props: Props) {
         </a>
       );
     case "mail":
+      // The mailto: address is put together only when the link is used, so it is never sitting in the
+      // page markup for a scraper to collect.
       return (
-        <a className={cls} href={`mailto:${props.email}`}>
+        <a
+          className={cls}
+          href="#contact"
+          onClick={(e) => {
+            e.preventDefault();
+            window.location.href = `mailto:${props.email}`;
+          }}
+        >
           {children}
         </a>
       );

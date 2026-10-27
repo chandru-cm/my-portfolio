@@ -1,6 +1,9 @@
 import { caseStudies, type CaseStudy } from "@my-portfolio/content";
 import { joinUrl } from "./url";
 
+export const SITE_VERSION = "v2";
+export const SITE_UPDATED = "Oct 2026";
+
 export const RESUME_URL = "/Chandra_Moorthy_Resume.pdf";
 export const HAS_RESUME = __HAS_RESUME__;
 
@@ -42,4 +45,10 @@ export function hostOf(url: string): string {
   } catch {
     return url;
   }
+}
+
+/** "a", "a and b", "a, b and c". */
+export function joinAnd(items: string[]): string {
+  if (items.length < 2) return items.join("");
+  return `${items.slice(0, -1).join(", ")} and ${items[items.length - 1]}`;
 }

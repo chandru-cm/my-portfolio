@@ -9,10 +9,10 @@ export const experience: Experience[] = [
     start: "2024-10",
     end: null,
     highlights: [
-      "Build generative AI features on Google Vertex AI and Gemini, using Pinecone vector search for context-aware responses and WebSocket streaming to deliver them.",
-      "Own features end to end across four production products: PostgreSQL and Firestore data models, Node.js and TypeScript APIs, Angular and React front ends, third-party integrations and deployment.",
-      "Build the payment collection, role-based access control and financial reporting that the products depend on.",
-      "Trace production defects through logs and code to the root cause, and validate each fix against existing business logic.",
+      "Build features end to end across four live SaaS products: data models, Node.js APIs, React Native, Flutter and web front ends, and deployment.",
+      "Work on Razorpay payment flows: orders, signature-verified webhooks, per-card billing and payment fixes.",
+      "Build generative AI features with Google Gemini: content suggestions and scanning paper visiting cards into digital cards.",
+      "Trace production defects from logs to root cause and verify each fix against existing business rules.",
     ],
   },
 ];
@@ -22,7 +22,7 @@ export const education: Education[] = [
     degree: "Bachelor of Engineering (B.E.)",
     field: "Mechatronics Engineering",
     institution: "Nehru Institute of Engineering and Technology",
-    region: "Tamil Nadu, India",
+    region: "India",
     startYear: 2017,
     endYear: 2021,
     cgpa: "7.25 / 10",

@@ -1,10 +1,10 @@
 export const MAX_QUESTION_CHARS = 300;
 
 export const PRIVATE_REFUSAL =
-  "I can't share private details such as a phone number, home address or salary. The best way to reach Chandra Moorthy is by email at cmchandru77@gmail.com.";
+  "I can't share private details such as a phone number, home address or salary. The best way to reach Chandra Moorthy is by email at chandramoorthy.dev@gmail.com.";
 
 export const UNKNOWN_ANSWER =
-  "I don't have that information in Chandra Moorthy's profile. You can ask about their projects, skills, experience or availability, or email cmchandru77@gmail.com.";
+  "I don't have that information in Chandra Moorthy's profile. You can ask about their projects, skills, experience or availability, or email chandramoorthy.dev@gmail.com.";
 
 export type Validation = { ok: true; question: string } | { ok: false; error: string };
 

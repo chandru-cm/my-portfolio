@@ -27,7 +27,7 @@ function month(iso: string): string {
 export function toResume(): Resume {
   const available = [
     profile.availability.relocation ? "Open to relocation" : "",
-    profile.availability.visaSponsorship ? "visa sponsorship welcome" : "",
+    profile.availability.visaSponsorship ? "visa sponsorship needed" : "",
   ].filter(Boolean);
 
   return {
@@ -46,10 +46,10 @@ export function toResume(): Resume {
       name: p.name,
       type: p.type,
       myPart: p.myPart,
-      bullets: p.contributions,
-      links: p.liveUrls,
+      bullets: p.contributions.slice(0, 2),
+      links: p.liveUrls.slice(0, 2),
     })),
-    skills: skills.map((s) => ({ label: s.group, items: s.items })),
+    skills: skills.map((s) => ({ label: s.group, items: s.items.map((i) => i.name) })),
     education: education.map((e) => ({
       degree: `${e.degree}, ${e.field}`,
       school: `${e.institution}, ${e.region}`,
