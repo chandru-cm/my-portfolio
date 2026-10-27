@@ -2,6 +2,7 @@ import { profile } from "@my-portfolio/content";
 import CopyEmail from "./CopyEmail";
 import Cta from "./Cta";
 import Reveal from "./Reveal";
+import TimeZoneFit from "./TimeZoneFit";
 import { HAS_RESUME, RESUME_URL } from "../lib/site";
 
 /** Shared by the home page and every project page. */
@@ -64,6 +65,7 @@ export default function Contact() {
               Replies within <b>{profile.replyTime}</b> · Working hours{" "}
               <b>{profile.workingHours}</b>
             </p>
+            <TimeZoneFit />
           </div>
         </Reveal>
       </div>

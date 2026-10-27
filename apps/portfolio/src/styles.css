@@ -121,8 +121,13 @@ th { border-top: 0; font-weight: 500; color: var(--muted); font-size: 13px; back
 tbody tr:hover { background: var(--side); }
 td a { color: var(--accent); text-decoration: none; font-weight: 600; }
 
-table.tz { min-width: 600px; }
-td.num, span.num { font-family: var(--mono); font-size: 13px; font-variant-numeric: tabular-nums; }
+.tzfit { margin-top: 12px; }
+.tzline { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; font-size: 14.5px; }
+details.more { margin-top: 6px; font-size: 13.5px; }
+details.more summary { cursor: pointer; color: var(--accent); min-height: 32px; display: flex; align-items: center; width: max-content; }
+details.more ul { display: grid; margin-top: 4px; }
+details.more li { display: flex; flex-wrap: wrap; gap: 4px 12px; justify-content: space-between; padding: 6px 0; border-top: 1px solid var(--line); }
+td.num, span.num, li > .num { font-family: var(--mono); font-size: 13px; font-variant-numeric: tabular-nums; }
 .pill { display: inline-block; font-size: 12px; padding: 2px 8px; border-radius: 4px; background: var(--ok-soft); color: var(--ok); white-space: nowrap; }
 .pill.lo { background: var(--warn-soft); color: var(--warn); }
 .at { opacity: 0.9; }

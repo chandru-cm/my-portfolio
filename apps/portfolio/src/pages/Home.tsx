@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import {
   education,
@@ -15,7 +15,6 @@ import Cta from "../components/Cta";
 import ProjectCard from "../components/ProjectCard";
 import Reveal from "../components/Reveal";
 import { HAS_RESUME, RESUME_URL, formatMonth, yearsSince } from "../lib/site";
-import { clock, offsetMinutes, overlap, visitorTimeZone } from "../lib/timezone";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
 
 type Filter = "All" | Category;
@@ -324,72 +323,6 @@ function Experience() {
   );
 }
 
-function Remote() {
-  // Worked out on the visitor's screen and refreshed each minute, so it follows daylight-saving time.
-  const [now, setNow] = useState(() => new Date());
-  useEffect(() => {
-    const t = setInterval(() => setNow(new Date()), 60_000);
-    return () => clearInterval(t);
-  }, []);
-
-  const mine = visitorTimeZone();
-  const regions = [...profile.overlapRegions];
-  if (mine && offsetMinutes(mine, now) !== 330 && !regions.some((r) => r.timeZone === mine)) regions.unshift({ region: `Your time zone (${mine})`, timeZone: mine });
-
-  return (
-    <section className="blk" id="remote">
-      <div className="wrap">
-        <Reveal>
-          <div className="sh">
-            <div>
-              <p className="lbl">Remote work</p>
-              <h2>Working across time zones</h2>
-              <p>
-                Based in {profile.location} ({profile.timezone}), working {profile.workingHours}. Overlap is counted against a 09:00–17:00 local day and
-                follows each region's current daylight-saving time.
-              </p>
-            </div>
-          </div>
-        </Reveal>
-        <Reveal>
-          <div className="tw">
-            <table className="tz">
-              <thead>
-                <tr>
-                  <th>Region</th>
-                  <th>Their time now</th>
-                  <th>My day in their time</th>
-                  <th>Overlap today</th>
-                </tr>
-              </thead>
-              <tbody>
-                {regions.map((r) => {
-                  const o = overlap(r.timeZone, profile.workDayUtc, now);
-                  const hours = o.minutes / 60;
-                  const local = new Intl.DateTimeFormat("en-GB", { timeZone: r.timeZone, hour: "2-digit", minute: "2-digit" }).format(now);
-                  return (
-                    <tr key={r.timeZone}>
-                      <td>{r.region}</td>
-                      <td className="num">{local}</td>
-                      <td className="num">
-                        {clock(o.mineStart)}–{clock(o.mineEnd)}
-                      </td>
-                      <td>
-                        <span className="num">{hours ? `${hours.toFixed(1)} h` : "None"}</span>{" "}
-                        <span className={`pill${hours >= 3 ? "" : " lo"}`}>{hours >= 3 ? "Strong" : hours > 0 ? "Limited" : "No overlap"}</span>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        </Reveal>
-      </div>
-    </section>
-  );
-}
-
 export default function Home() {
   useDocumentTitle();
   return (
@@ -398,7 +331,6 @@ export default function Home() {
       <Projects />
       <Skills />
       <Experience />
-      <Remote />
     </>
   );
 }
