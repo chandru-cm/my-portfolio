@@ -1,4 +1,5 @@
 import { useRef, useState, type KeyboardEvent, type PointerEvent } from "react";
+import { createPortal } from "react-dom";
 import type { ProjectImage } from "@my-portfolio/content";
 import Lightbox from "./Lightbox";
 
@@ -100,7 +101,8 @@ export default function Carousel({ images, ratio = "16/9", fallback }: Props) {
           </div>
         </>
       )}
-      {open && <Lightbox images={images} index={i} onIndex={setI} onClose={() => setOpen(false)} />}
+      {/* Drawn on the page itself, not inside the card: a card that moves or clips would trap and flicker a fixed overlay. */}
+      {open && createPortal(<Lightbox images={images} index={i} onIndex={setI} onClose={() => setOpen(false)} />, document.body)}
     </div>
   );
 }
