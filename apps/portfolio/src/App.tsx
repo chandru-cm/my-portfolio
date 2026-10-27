@@ -1,7 +1,8 @@
 import { useEffect } from "react";
-import { Route, Routes, useLocation } from "react-router-dom";
+import { Navigate, Route, Routes, useLocation, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import ChatWidget from "./components/ChatWidget";
+import Contact from "./components/Contact";
 import Footer from "./components/Footer";
 import Nav from "./components/Nav";
 import ScrollProgress from "./components/ScrollProgress";
@@ -28,6 +29,12 @@ function useScrollManager() {
   }, [pathname, hash, key]);
 }
 
+/** The v1 address of a project page, kept so old links still work. */
+function OldWorkLink() {
+  const { id } = useParams();
+  return <Navigate to={`/projects/${id}`} replace />;
+}
+
 export default function App() {
   const { pathname } = useLocation();
   useScrollManager();
@@ -48,10 +55,12 @@ export default function App() {
       >
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/work/:id" element={<Project />} />
+          <Route path="/projects/:id" element={<Project />} />
+          <Route path="/work/:id" element={<OldWorkLink />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </motion.main>
+      {pathname === "/" || pathname.startsWith("/projects/") ? <Contact /> : null}
       <Footer />
       {CHAT_ENABLED && <ChatWidget />}
     </>

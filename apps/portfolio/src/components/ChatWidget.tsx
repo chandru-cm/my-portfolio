@@ -5,11 +5,25 @@ import { MAX_QUESTION_CHARS, useChat, type ChatMessage } from "../hooks/useChat"
 import { linkify } from "../lib/linkify";
 
 const SUGGESTIONS = [
-  `What AI work has ${profile.name} done?`,
-  `Is ${profile.name} open to relocation?`,
-  `What did ${profile.name} build in RentEasify?`,
-  `How can I contact ${profile.name}?`,
+  `What is ${profile.name}'s tech stack?`,
+  `Is ${profile.name} open to remote or relocation roles?`,
+  `Which time zones can ${profile.name} work with?`,
+  `What did ${profile.name} build on RentEasify?`,
 ];
+
+/** A model answer that says it has nothing on the topic should not list sources as if it did. */
+const DECLINES = /^I don't have that information/i;
+
+const SPARK = "M12 2c.4 4.6 2.4 6.9 7 7.4v.2c-4.6.5-6.6 2.8-7 7.4h-.2c-.4-4.6-2.4-6.9-7-7.4v-.2c4.6-.5 6.6-2.8 7-7.4z";
+
+function Spark({ size = 16 }: { size?: number }) {
+  return (
+    <svg className="spark" width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d={SPARK} />
+      <path d="M19 15c.2 2 1 2.9 3 3.1v.1c-2 .2-2.8 1.1-3 3.1h-.1c-.2-2-1-2.9-3-3.1v-.1c2-.2 2.8-1.1 3-3.1z" opacity=".7" />
+    </svg>
+  );
+}
 
 function Linked({ text }: { text: string }): ReactNode {
   return linkify(text).map((s, i) => {
@@ -44,14 +58,28 @@ function Thinking() {
   );
 }
 
-function Bubble({ m }: { m: ChatMessage }) {
+function Bubble({ m, onAsk, busy }: { m: ChatMessage; onAsk: (q: string) => void; busy: boolean }) {
   if (m.role === "user") return <div className="msg msg-user">{m.text}</div>;
   const tone = m.kind === "unknown" || m.kind === "refusal" || m.kind === "error" ? " msg-note" : "";
   return (
     <div className={`msg msg-bot${tone}`}>
       {m.text ? <span className="msg-text"><Linked text={m.text} /></span> : <Thinking />}
-      {m.done && m.kind === "answer" && m.sources && m.sources.length > 0 && (
+      {m.done && m.kind === "answer" && !DECLINES.test(m.text) && m.sources && m.sources.length > 0 && (
         <p className="msg-sources">Sources: {m.sources.join(" · ")}</p>
+      )}
+      {m.done && m.action && (
+        <a className="btn btn-primary chat-action" href={m.action.href}>
+          {m.action.label}
+        </a>
+      )}
+      {m.done && m.suggestions && m.suggestions.length > 0 && (
+        <div className="chat-suggest chat-suggest-inline">
+          {m.suggestions.map((q) => (
+            <button key={q} type="button" className="chip" disabled={busy} onClick={() => onAsk(q)}>
+              {q}
+            </button>
+          ))}
+        </div>
       )}
     </div>
   );
@@ -82,13 +110,15 @@ export default function ChatWidget() {
   const hasAsked = messages.length > 0;
 
   async function submit(text: string) {
+    // Clear the box as soon as the question is sent, so the text is not left sitting there while
+    // the answer loads. If the question is rejected, put it back so it can be edited.
+    setError("");
+    setInput("");
     const problem = await send(text);
     if (problem) {
       setError(problem);
-      return;
+      setInput(text);
     }
-    setError("");
-    setInput("");
   }
 
   function onSubmit(e: FormEvent) {
@@ -111,10 +141,8 @@ export default function ChatWidget() {
           aria-expanded={false}
           aria-controls="chat-panel"
         >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <path d="M21 15a2 2 0 0 1-2 2H8l-5 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-          </svg>
-          <span className="chat-launcher-long">Ask about {profile.name}</span>
+          <Spark />
+          <span className="chat-launcher-long">Ask AI about me</span>
           <span className="chat-launcher-short">Ask AI</span>
         </button>
       )}
@@ -134,7 +162,9 @@ export default function ChatWidget() {
           >
             <header className="chat-head">
               <div>
-                <strong>Ask about {profile.name}</strong>
+                <strong>
+                  <Spark /> Ask AI <small>about {profile.name.split(" ")[0]}'s work</small>
+                </strong>
                 <span>Answers come from approved profile content</span>
               </div>
               <button className="icon-btn" type="button" onClick={() => setOpen(false)} aria-label="Close chat">
@@ -147,7 +177,7 @@ export default function ChatWidget() {
                 Hi, I can answer questions about {profile.name}'s experience, projects, skills and availability. What would you like to know?
               </div>
               {messages.map((m) => (
-                <Bubble key={m.id} m={m} />
+                <Bubble key={m.id} m={m} busy={busy} onAsk={(q) => void submit(q)} />
               ))}
             </div>
 
@@ -174,7 +204,7 @@ export default function ChatWidget() {
                 value={input}
                 maxLength={MAX_QUESTION_CHARS}
                 autoComplete="off"
-                placeholder="Ask about projects, skills or availability"
+                placeholder="Ask about projects, skills, visa…"
                 onChange={(e) => {
                   setInput(e.target.value);
                   if (error) setError("");
@@ -185,7 +215,7 @@ export default function ChatWidget() {
               </button>
             </form>
             <p className="chat-foot">
-              {remaining} question{remaining === 1 ? "" : "s"} left in this session. AI-generated from {profile.name}'s profile. This site does not store your questions.
+              {remaining} question{remaining === 1 ? "" : "s"} left in this session. Greetings and quick replies do not count. AI-generated from {profile.name}'s profile. This site does not store your questions.
             </p>
           </motion.section>
         )}

@@ -11,7 +11,17 @@ export type Profile = {
   availability: {
     relocation: boolean;
     visaSponsorship: boolean;
+    lookingFor: string;
+    workSetup: string;
   };
+  /** Shown in the contact block and used by the chatbot. */
+  workingHours: string;
+  /** The working day in UTC minutes after midnight, so overlap can be worked out for any date. */
+  workDayUtc: { start: number; end: number };
+  /** Regions shown in the time-zone block, as IANA time zone names. */
+  overlapRegions: { region: string; timeZone: string }[];
+  timezone: string;
+  replyTime: string;
 };
 
 export type Experience = {
@@ -36,10 +46,27 @@ export type Education = {
   cgpa: string;
 };
 
+/** 3 = daily, in production; 2 = shipped on real projects; 1 = familiar. The owner's own judgement. */
+export type SkillLevel = 1 | 2 | 3;
+
+export type Skill = {
+  name: string;
+  level: SkillLevel;
+  /** Stack tags that count as using this skill. When set, the site shows how many projects use it. */
+  countFrom?: string[];
+};
+
 export type SkillGroup = {
   group: string;
-  items: string[];
+  items: Skill[];
 };
+
+export type ProjectLink = { label: string; url: string };
+export type ProjectImage = { src: string; alt: string };
+export type Feature = { title: string; text: string; how?: string };
+export type Challenge = { title: string; problem: string; approach: string; result?: string };
+export type Architecture = { layers: [string, string][]; notes?: string[] };
+export type Result = { value: string; label: string };
 
 export type Project = {
   id: string;
@@ -55,6 +82,27 @@ export type Project = {
   categories: Category[];
   /** Public live products only. */
   liveUrls: string[];
+
+  // Case-study fields. Every one is optional: a section or header item with no data is not rendered.
+  role?: string;
+  period?: string;
+  team?: string;
+  platform?: string;
+  /** Labelled public links, shown on the project page. */
+  links?: ProjectLink[];
+  /** Screenshots under public/media. */
+  images?: ProjectImage[];
+  /** Short bullets on the home card. */
+  cardPoints?: string[];
+  /** One line for the table view. */
+  tableSummary?: string;
+  overview?: string;
+  problem?: string;
+  features?: Feature[];
+  architecture?: Architecture;
+  challenges?: Challenge[];
+  results?: Result[];
+  learned?: string;
 };
 
 /**

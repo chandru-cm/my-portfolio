@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { routeQuestion, validateQuestion } from "./guard";
+import { enquiryAction, routeQuestion, validateQuestion } from "./guard";
 import { buildPrompt, sourcesOf, SYSTEM_PROMPT } from "./prompt";
 import type { Match } from "./types";
 
@@ -22,12 +22,39 @@ test("private-detail requests are refused before retrieval", () => {
   for (const q of [
     "What is Chandra Moorthy's phone number?",
     "what's the contact number",
-    "Expected salary?",
     "What is the home address?",
     "share the passport details",
   ]) {
     assert.equal(routeQuestion(q).kind, "refuse-private", q);
   }
+});
+
+test("salary and rate questions get the email reply instead of a refusal", () => {
+  for (const q of ["Expected salary?", "What is the CTC?", "What is your hourly rate?", "What are the salary expectations for this role"]) {
+    assert.equal(routeQuestion(q).kind, "compensation", q);
+  }
+});
+
+test("greetings, thanks and help are answered without searching", () => {
+  assert.equal(routeQuestion("Hello").kind, "greeting");
+  assert.equal(routeQuestion("hi there!").kind, "greeting");
+  assert.equal(routeQuestion("Good morning").kind, "greeting");
+  assert.equal(routeQuestion("Thanks a lot!").kind, "thanks");
+  assert.equal(routeQuestion("ok").kind, "thanks");
+  assert.equal(routeQuestion("What can you do?").kind, "help");
+  assert.equal(routeQuestion("who are you").kind, "help");
+});
+
+test("a greeting word inside a real question is still searched", () => {
+  for (const q of ["Hello, what did they build in RentEasify?", "Is the payment model good?", "Help me understand the SociBooks roles"]) {
+    assert.equal(routeQuestion(q).kind, "search", q);
+  }
+});
+
+test("the enquiry action is an email that carries the questions to answer", () => {
+  const a = enquiryAction();
+  assert.match(a.href, /^mailto:chandramoorthy\.dev@gmail\.com\?subject=/);
+  assert.match(decodeURIComponent(a.href), /Budget or salary range/);
 });
 
 test("ordinary questions are not refused", () => {

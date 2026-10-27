@@ -224,7 +224,7 @@ test("a close FAQ match is answered instantly from the approved text, without th
   const events = await readSse(res);
   assert.equal(events[0].data.kind, "answer");
   assert.deepEqual(events[0].data.sources, ["Is Chandra Moorthy open to relocation or visa sponsorship?"]);
-  assert.match(tokensOf(events), /^Yes\. Chandra Moorthy is open to relocation and to visa sponsorship/);
+  assert.match(tokensOf(events), /^Yes\. Chandra Moorthy is open to relocating abroad/);
   assert.doesNotMatch(tokensOf(events), /^Is Chandra Moorthy open/);
   assert.equal(events.at(-1)?.event, "done");
   assert.equal(generator.calls, 0);

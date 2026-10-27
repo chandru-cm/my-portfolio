@@ -2,6 +2,7 @@ import { GeminiEmbedder, GeminiGenerator, PineconeStore } from "@my-portfolio/ra
 import { Redis } from "@upstash/redis";
 import type { ChatDeps } from "./chat";
 import { loadConfig, type Config, type Env } from "./config";
+import { AnswerCache } from "./cache";
 import { InMemoryRateLimiter, UpstashRateLimiter } from "./limiter";
 
 const MINUTE = 60;
@@ -44,6 +45,7 @@ export function createDeps(config: Config): ChatDeps {
       firstTokenTimeoutMs: config.firstTokenTimeoutMs,
     }),
     limits,
+    cache: new AnswerCache(),
     log: (event) => console.log(JSON.stringify({ evt: "chat", ...event })),
   };
 }

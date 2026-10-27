@@ -2,12 +2,14 @@ import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { profile } from "@my-portfolio/content";
 import ThemeToggle from "./ThemeToggle";
+import Cta from "./Cta";
+import { HAS_RESUME, RESUME_URL } from "../lib/site";
 import { useSectionLink } from "../hooks/useSectionLink";
 
 const LINKS = [
-  { id: "work", label: "Work" },
-  { id: "experience", label: "Experience" },
+  { id: "projects", label: "Projects" },
   { id: "skills", label: "Skills" },
+  { id: "experience", label: "Experience" },
   { id: "contact", label: "Contact" },
 ];
 
@@ -30,10 +32,13 @@ export default function Nav() {
   // Highlight the section currently in view (home page only).
   useEffect(() => {
     if (!onHome) return setActive("");
-    const sections = LINKS.map((l) => document.getElementById(l.id)).filter(Boolean) as HTMLElement[];
+    const sections = LINKS.map((l) => document.getElementById(l.id)).filter(
+      Boolean,
+    ) as HTMLElement[];
     const io = new IntersectionObserver(
-      (entries) => entries.forEach((e) => e.isIntersecting && setActive(e.target.id)),
-      { rootMargin: "-40% 0px -55% 0px" }
+      (entries) =>
+        entries.forEach((e) => e.isIntersecting && setActive(e.target.id)),
+      { rootMargin: "-40% 0px -55% 0px" },
     );
     sections.forEach((s) => io.observe(s));
     return () => io.disconnect();
@@ -44,9 +49,12 @@ export default function Nav() {
       <div className="wrap nav-in">
         <Link className="brand" to="/" aria-label={`${profile.name}, home`}>
           {profile.name}
-          <span>.</span>
         </Link>
-        <nav id="primary-nav" className={open ? "open" : ""} aria-label="Primary">
+        <nav
+          id="primary-nav"
+          className={open ? "open" : ""}
+          aria-label="Primary"
+        >
           {LINKS.map((l) => (
             <Link
               key={l.id}
@@ -61,6 +69,17 @@ export default function Nav() {
         </nav>
         <div className="nav-actions">
           <ThemeToggle />
+          {HAS_RESUME && (
+            <Cta
+              kind="download"
+              href={RESUME_URL}
+              fileName="Chandra_Moorthy_Resume.pdf"
+              variant="primary"
+              className="nav-resume"
+            >
+              Resume
+            </Cta>
+          )}
           <button
             className="icon-btn burger"
             type="button"

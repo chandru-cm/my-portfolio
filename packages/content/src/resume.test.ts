@@ -23,8 +23,12 @@ test("every link is https", () => {
   assert.ok(links.every((l) => l.startsWith("https://")));
 });
 
-test("skills are tiered and do not list buzzword filler", () => {
+test("skills are grouped by area and do not list buzzword filler", () => {
   const labels = toResume().skills.map((s) => s.label);
-  assert.equal(labels[0], "Daily, in production");
+  assert.equal(labels[0], "Backend");
   assert.doesNotMatch(everything(), /Debugging|Code review/);
+});
+
+test("the resume names no technology the site does not claim", () => {
+  assert.doesNotMatch(everything(), /Pinecone|Vertex/);
 });

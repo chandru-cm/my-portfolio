@@ -34,8 +34,15 @@ const TEXT_ON_BACKGROUND: [string, string][] = [
   ["ok", "ok-soft"], // the "open to relocation" pill
   ["warn", "warn-soft"], // refusal and error notes
   ["danger", "bg"], // form and chat errors
-  ["bg", "ink"], // primary button text
-  ["bg", "accent"], // selected filter chip text
+  ["accent-ink", "accent"], // primary button text
+  ["ink", "side"],
+  ["muted", "side"], // table header, skills row labels
+  ["muted", "hover"], // selected filter, tags
+  ["ink", "hover"],
+  ["accent", "side"],
+  ["ai", "ai-soft"], // Ask AI accents
+  ["ink", "callout"], // relocation callout
+  ["ink", "accent-soft"],
 ];
 
 for (const t of themes) {
