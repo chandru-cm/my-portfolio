@@ -51,6 +51,9 @@ export default function Lightbox({ images, index, onIndex, onClose }: Props) {
       aria-modal="true"
       aria-label="Image viewer"
       onClick={(e) => e.target === e.currentTarget && onClose()}
+      // The viewer sits in a portal, but React still bubbles events to the carousel that opened it.
+      onPointerDown={(e) => e.stopPropagation()}
+      onPointerUp={(e) => e.stopPropagation()}
     >
       {n > 1 ? (
         <button className="lb-btn lb-prev" type="button" aria-label="Previous image" onClick={() => go(-1)}>
