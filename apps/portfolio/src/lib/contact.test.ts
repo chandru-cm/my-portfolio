@@ -30,7 +30,7 @@ test("the payload trims text, carries the trap fields, and only a call has a pre
 
 test("a successful send resolves ok", async () => {
   const result = await sendContact("/api/contact", toPayload(good, "", 5000), async () => new Response('{"ok":true}', { status: 200 }));
-  assert.deepEqual(result, { ok: true });
+  assert.deepEqual(result, { ok: true, receipt: "off" }, "an older server that does not say is treated as no receipt");
 });
 
 test("a rejected form can be fixed and retried, while a server problem points to email", async () => {
@@ -86,3 +86,33 @@ test("the payload carries the channel and the phone with its country code", () =
   assert.equal("phone" in none, false);
 });
 
+
+test("the success result says whether the receipt email went out", async () => {
+  const reply = (body: unknown) => async () => new Response(JSON.stringify(body), { status: 200 });
+  const ok = (r: Awaited<ReturnType<typeof sendContact>>) => (r.ok ? r.receipt : "not ok");
+  assert.equal(ok(await sendContact("/x", toPayload(good, "", 5000), reply({ ok: true, delivered: ["email"], receipt: "sent" }))), "sent");
+  assert.equal(ok(await sendContact("/x", toPayload(good, "", 5000), reply({ ok: true, delivered: ["email"], receipt: "failed" }))), "failed");
+  assert.equal(ok(await sendContact("/x", toPayload(good, "", 5000), reply({ ok: true, delivered: ["email"], receipt: "off" }))), "off");
+  assert.equal(ok(await sendContact("/x", toPayload(good, "", 5000), reply({ ok: true, delivered: ["email"], receipt: "banana" }))), "off", "an unknown value is ignored");
+  assert.equal(ok(await sendContact("/x", toPayload(good, "", 5000), async () => new Response("not json", { status: 200 }))), "off", "a success with an unreadable body is still a success");
+});
+
+test("a send that never answers gives up, says it cannot tell whether it arrived, and offers the email fallback", async () => {
+  // A fetch that only ends when it is aborted, like a connection that hangs.
+  const hangs = (_url: unknown, init?: RequestInit) =>
+    new Promise<Response>((_resolve, reject) => {
+      init?.signal?.addEventListener("abort", () => reject(Object.assign(new Error("aborted"), { name: "AbortError" })));
+    });
+  const started = Date.now();
+  const result = await sendContact("/x", toPayload(good, "", 5000), hangs as typeof fetch, 40);
+  assert.ok(Date.now() - started < 1000, "it stopped waiting");
+  assert.equal(result.ok, false);
+  assert.equal(result.ok === false && result.timedOut, true);
+  assert.equal(result.ok === false && result.fallback, true);
+  assert.match(result.ok === false ? result.message : "", /cannot tell whether your message was sent/);
+});
+
+test("a fast reply is not mistaken for a timeout", async () => {
+  const result = await sendContact("/x", toPayload(good, "", 5000), async () => new Response('{"ok":true,"receipt":"sent"}', { status: 200 }), 5000);
+  assert.equal(result.ok, true);
+});

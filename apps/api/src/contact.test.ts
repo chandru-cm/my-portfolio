@@ -328,3 +328,19 @@ test("with no phone, the receipt says the reply goes by email, to the address th
   assert.match(mailer.sent[1].text, /by email at jane@company\.com/);
   assert.match(mailer.sent[1].html ?? "", /by email at <strong>jane@company\.com<\/strong>/);
 });
+
+test("the response says whether the visitor's receipt went out, so the page never claims more than is true", async () => {
+  const sent = await handleContact(post(GOOD), makeDeps());
+  assert.equal((await sent.json()).receipt, "sent");
+
+  const failedReceipt = await handleContact(post(GOOD), makeDeps({ mailer: new FakeMailer("confirmation") }));
+  assert.equal(failedReceipt.status, 200, "a failed receipt never fails the request");
+  assert.equal((await failedReceipt.json()).receipt, "failed");
+
+  const off = makeDeps();
+  off.config.sendConfirmation = false;
+  assert.equal((await (await handleContact(post(GOOD), off)).json()).receipt, "off");
+
+  const alertOnly = makeDeps({ mailer: undefined });
+  assert.equal((await (await handleContact(post(GOOD), alertOnly)).json()).receipt, "off", "no mailer means no receipt");
+});
