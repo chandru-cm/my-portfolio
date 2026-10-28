@@ -13,3 +13,6 @@ dist
 
 # Vercel build output (generated)
 .vercel
+
+# Generated email preview page
+.preview/

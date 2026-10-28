@@ -18,6 +18,11 @@ export const HAS_RESUME = __HAS_RESUME__;
 export const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL ?? "").trim();
 export const CHAT_ENDPOINT = joinUrl(API_BASE_URL, "/api/chat");
 
+export const CONTACT_ENDPOINT = joinUrl(API_BASE_URL, "/api/contact");
+
+/** Same rule as the chat: always on in development, and hidden in production until the API is deployed and this is set. */
+export const CONTACT_FORM_ENABLED = import.meta.env.DEV || import.meta.env.VITE_CONTACT_ENABLED === "true";
+
 export const CHAT_ENABLED = import.meta.env.DEV || import.meta.env.VITE_CHAT_ENABLED === "true";
 
 /** Drafts are shown only while developing, so unapproved wording can never reach production. */

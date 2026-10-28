@@ -1,15 +1,12 @@
-import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type FormEvent, type KeyboardEvent, type ReactNode } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { profile } from "@my-portfolio/content";
+import { profile, suggestionPool } from "@my-portfolio/content";
 import { MAX_QUESTION_CHARS, useChat, type ChatMessage } from "../hooks/useChat";
 import { linkify } from "../lib/linkify";
+import { pickSuggestions } from "../lib/suggestions";
 
-const SUGGESTIONS = [
-  `What is ${profile.name}'s tech stack?`,
-  `Is ${profile.name} open to remote or relocation roles?`,
-  `Which time zones can ${profile.name} work with?`,
-  `What did ${profile.name} build on RentEasify?`,
-];
+/** How long the starter questions stay put before a new set rotates in, while the visitor has not touched anything. */
+const ROTATE_MS = 12_000;
 
 /** A model answer that says it has nothing on the topic should not list sources as if it did. */
 const DECLINES = /^I don't have that information/i;
@@ -48,17 +45,21 @@ function Thinking() {
   }, []);
   return (
     <span className="chat-thinking" role="status">
-      <span className="dots" aria-hidden="true">
-        <i />
-        <i />
-        <i />
+      <span className="chat-thinking-row">
+        <span className="dots" aria-hidden="true">
+          <i />
+          <i />
+          <i />
+        </span>
+        <span className="chat-thinking-note">{slow ? "Still working. Answers can take up to 15 seconds." : "Reading the approved profile…"}</span>
       </span>
-      <span className="chat-thinking-note">{slow ? "Still working. Answers can take up to 15 seconds." : "Thinking"}</span>
+      <span className="shim" style={{ width: "92%" }} aria-hidden="true" />
+      <span className="shim" style={{ width: "64%" }} aria-hidden="true" />
     </span>
   );
 }
 
-function Bubble({ m, onAsk, busy }: { m: ChatMessage; onAsk: (q: string) => void; busy: boolean }) {
+function Bubble({ m }: { m: ChatMessage }) {
   if (m.role === "user") return <div className="msg msg-user">{m.text}</div>;
   const tone = m.kind === "unknown" || m.kind === "refusal" || m.kind === "error" ? " msg-note" : "";
   return (
@@ -71,15 +72,6 @@ function Bubble({ m, onAsk, busy }: { m: ChatMessage; onAsk: (q: string) => void
         <a className="btn btn-primary chat-action" href={m.action.href}>
           {m.action.label}
         </a>
-      )}
-      {m.done && m.suggestions && m.suggestions.length > 0 && (
-        <div className="chat-suggest chat-suggest-inline">
-          {m.suggestions.map((q) => (
-            <button key={q} type="button" className="chip" disabled={busy} onClick={() => onAsk(q)}>
-              {q}
-            </button>
-          ))}
-        </div>
       )}
     </div>
   );
@@ -101,13 +93,38 @@ export default function ChatWidget() {
     wasOpen.current = open;
   }, [open]);
 
+  // New content is always brought into view. A new message scrolls smoothly; streamed words just keep the
+  // start of the answer visible, so the visitor reads from the first line instead of being dropped at the end.
+  const messageCount = useRef(0);
   useEffect(() => {
     const el = logRef.current;
-    if (el) el.scrollTop = el.scrollHeight;
+    if (!el) return;
+    const isNew = messages.length !== messageCount.current;
+    messageCount.current = messages.length;
+    const last = el.lastElementChild as HTMLElement | null;
+    const bottom = el.scrollHeight - el.clientHeight;
+    const answerTop = last?.classList.contains("msg-bot") ? Math.max(0, last.offsetTop - 12) : bottom;
+    const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    el.scrollTo({ top: Math.min(bottom, answerTop), behavior: isNew && !still ? "smooth" : "auto" });
   }, [messages, open]);
 
   const busy = status !== "idle";
-  const hasAsked = messages.length > 0;
+
+  // Starter questions are drawn at random, and swapped for a fresh set now and then until the visitor
+  // touches the chat. They stop moving the moment someone types or asks, so a button never shifts under a tap.
+  const [seed, setSeed] = useState(0);
+  const asked = useMemo(() => messages.filter((m) => m.role === "user").map((m) => m.text), [messages]);
+  const hasAsked = asked.length > 0;
+  const picks = useMemo(
+    () => pickSuggestions(suggestionPool, asked, hasAsked ? 2 : 4),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [seed, asked.length]
+  );
+  useEffect(() => {
+    if (!open || hasAsked || input) return;
+    const t = setInterval(() => setSeed((n) => n + 1), ROTATE_MS);
+    return () => clearInterval(t);
+  }, [open, hasAsked, input]);
 
   async function submit(text: string) {
     // Clear the box as soon as the question is sent, so the text is not left sitting there while
@@ -137,7 +154,10 @@ export default function ChatWidget() {
           ref={launcherRef}
           className="chat-launcher"
           type="button"
-          onClick={() => setOpen(true)}
+          onClick={() => {
+            setSeed((n) => n + 1);
+            setOpen(true);
+          }}
           aria-expanded={false}
           aria-controls="chat-panel"
         >
@@ -177,15 +197,19 @@ export default function ChatWidget() {
                 Hi, I can answer questions about {profile.name}'s experience, projects, skills and availability. What would you like to know?
               </div>
               {messages.map((m) => (
-                <Bubble key={m.id} m={m} busy={busy} onAsk={(q) => void submit(q)} />
+                <Bubble key={m.id} m={m} />
               ))}
             </div>
 
-            {!hasAsked && (
-              <div className="chat-suggest">
-                {SUGGESTIONS.map((s) => (
-                  <button key={s} type="button" className="chip" onClick={() => void submit(s)}>
-                    {s}
+            {!busy && picks.length > 0 && (
+              <div className="chat-suggest" role="group" aria-label={hasAsked ? "Ask next" : "Questions to try"}>
+                <p className="chat-suggest-label">{hasAsked ? "Ask next" : "Curious about"}</p>
+                {picks.map((q) => (
+                  <button key={q} type="button" className="chip" onClick={() => void submit(q)}>
+                    <span>{q}</span>
+                    <span className="chip-go" aria-hidden="true">
+                      →
+                    </span>
                   </button>
                 ))}
               </div>

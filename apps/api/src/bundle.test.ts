@@ -18,7 +18,7 @@ execFileSync(process.execPath, [join(apiRoot, "scripts", "build.mjs")], { cwd: a
 
 test("writes Vercel's Build Output format", () => {
   assert.equal(readJson(join(out, "config.json")).version, 3);
-  for (const name of ["chat", "health"]) {
+  for (const name of ["chat", "contact", "health"]) {
     const cfg = readJson(join(func(name), ".vc-config.json"));
     assert.equal(cfg.runtime, "nodejs22.x");
     assert.equal(cfg.handler, "index.js");
@@ -40,7 +40,13 @@ test("the bundles are self-contained functions that load and answer", async () =
   assert.equal(typeof health, "function");
   assert.equal(typeof chat, "function");
 
-  const server = createServer((req, res) => (req.url?.startsWith("/api/health") ? health(req, res) : chat(req, res)));
+  const contact = require(join(func("contact"), "index.js"));
+  assert.equal(typeof contact, "function");
+  for (const k of ["SMTP_USER", "SMTP_PASS", "TELEGRAM_BOT_TOKEN", "TELEGRAM_CHAT_ID"]) delete process.env[k];
+
+  const server = createServer((req, res) =>
+    req.url?.startsWith("/api/health") ? health(req, res) : req.url?.startsWith("/api/contact") ? contact(req, res) : chat(req, res)
+  );
   await new Promise<void>((r) => server.listen(0, "127.0.0.1", r));
   const base = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
   const realError = console.error;
@@ -55,6 +61,12 @@ test("the bundles are self-contained functions that load and answer", async () =
     const text = await c.text();
     assert.equal(JSON.parse(text).error.code, "internal");
     assert.doesNotMatch(text, /GEMINI|PINECONE|required/i, "the response must not name settings");
+
+    const k = await fetch(`${base}/api/contact`, { method: "POST", body: "{}" });
+    assert.equal(k.status, 500);
+    const kText = await k.text();
+    assert.equal(JSON.parse(kText).error.code, "internal");
+    assert.doesNotMatch(kText, /SMTP|TELEGRAM|PASS/i, "the response must not name settings");
   } finally {
     console.error = realError;
     server.closeAllConnections();

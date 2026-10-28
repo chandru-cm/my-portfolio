@@ -7,16 +7,19 @@
   "scripts": {
     "build": "node scripts/build.mjs",
     "dev": "node --env-file-if-exists=../../.env --import tsx dev-server.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "mail:preview": "node --import tsx scripts/mail-preview.ts"
   },
   "dependencies": {
     "@my-portfolio/content": "*",
     "@my-portfolio/rag": "*",
     "@upstash/ratelimit": "^2.2.0",
-    "@upstash/redis": "^1.39.0"
+    "@upstash/redis": "^1.39.0",
+    "nodemailer": "^10.2.1"
   },
   "devDependencies": {
     "@my-portfolio/config": "*",
+    "@types/nodemailer": "^8.0.2",
     "esbuild": "^0.21.5",
     "typescript": "^5.6.3"
   }

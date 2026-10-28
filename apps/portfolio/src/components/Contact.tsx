@@ -1,9 +1,10 @@
 import { profile } from "@my-portfolio/content";
+import ContactForm from "./ContactForm";
 import CopyEmail from "./CopyEmail";
 import Cta from "./Cta";
 import Reveal from "./Reveal";
 import TimeZoneFit from "./TimeZoneFit";
-import { HAS_RESUME, RESUME_URL } from "../lib/site";
+import { CONTACT_FORM_ENABLED, HAS_RESUME, RESUME_URL } from "../lib/site";
 
 /** Shared by the home page and every project page. */
 export default function Contact() {
@@ -11,7 +12,7 @@ export default function Contact() {
   return (
     <section className="contact" id="contact">
       <div className="wrap">
-        <Reveal className="contact-grid">
+        <Reveal className={CONTACT_FORM_ENABLED ? "contact-grid contact-grid-form" : "contact-grid"}>
           <div>
             <p className="lbl">Contact</p>
             <h2>
@@ -67,6 +68,11 @@ export default function Contact() {
             </p>
             <TimeZoneFit />
           </div>
+          {CONTACT_FORM_ENABLED && (
+            <div className="contact-form">
+              <ContactForm />
+            </div>
+          )}
         </Reveal>
       </div>
     </section>

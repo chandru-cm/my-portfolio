@@ -99,6 +99,28 @@ Each project needs the other's address, so one of them always gets configured af
 
 **Region:** leave the API's function region at Vercel's default (Washington DC, `iad1`). Your Pinecone index is in AWS `us-east-1`, so the two are close together. Pick an Upstash region near there too.
 
+## 5b. Turn on the contact form (email to your inbox)
+
+The site has a form that emails visitors' messages and call requests to you. It lives in the API project, so the keys go there, never in the website.
+
+1. **Gmail app password.** Use a personal Gmail account. Turn on 2-Step Verification, then create an app password at https://myaccount.google.com/apppasswords. Google shows 16 characters in four groups of four; paste them as they are or without spaces.
+2. **Phone alert (optional but recommended).** In Telegram, message @BotFather, send `/newbot`, and keep the bot token. Send your new bot any message, then get your numeric chat id.
+3. In the **API** project, add these Environment Variables, then **redeploy**:
+
+| Name | Value |
+| --- | --- |
+| `SMTP_USER` | the Gmail address that owns the app password |
+| `SMTP_PASS` | the 16-character app password |
+| `CONTACT_TO` | optional: where messages are delivered (defaults to `SMTP_USER`) |
+| `TELEGRAM_BOT_TOKEN` | optional: from BotFather |
+| `TELEGRAM_CHAT_ID` | optional: your chat id |
+
+4. In the **website** project, add `VITE_CONTACT_ENABLED` = `true` and redeploy it.
+
+How it behaves: the visitor's message is delivered by email and by the phone alert at the same time. If either one gets through, the visitor sees "sent". If both fail, they see your email address so nothing is lost. Each visitor also gets a short "received" email (set `CONTACT_CONFIRMATION=false` to switch it off). Limits default to 3 per minute and 10 per day per visitor, and 60 per day overall; Gmail's own daily sending limit is the real ceiling.
+
+**Check:** submit the form on the live site, then look for the email and the Telegram message. The function log shows `{"evt":"contact","status":200,...}` with no names or addresses.
+
 ## 6. Test the live deployment
 
 Run the automated check from your machine (it needs no keys):

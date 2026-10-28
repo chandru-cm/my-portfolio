@@ -81,6 +81,10 @@ Errors before streaming starts are plain JSON, `{ "error": { "code": "...", "mes
 
 CORS preflight. `204` with CORS headers when the origin is allowed.
 
+### `POST /api/contact`
+
+The contact form. Body: `{ kind: "message" | "call", name, email, topic, message, channel?: "email" | "whatsapp" | "phone", phone?: { dial, number }, preferred?: { date, time?, timeZone? }, website, elapsedMs }`. `phone` is optional for email and required when `channel` is `whatsapp` or `phone`; `dial` is a country code such as `+91`, and the rules live in `packages/content/src/phone.ts` so the site and the API agree. The owner email then gets WhatsApp and Call buttons. `website` is a hidden honeypot field and `elapsedMs` is how long the form was open; a filled honeypot or an instant submit gets a fake `200` and nothing is sent. Success is `200 { ok: true, delivered: ["email" | "alert"] }`: delivered by at least one channel. Errors use the same shape as chat: `400` for a field to fix, `429` for rate limiting, `502` when no channel delivered. Settings are in `.env.example` (`SMTP_*`, `TELEGRAM_*`, `CONTACT_*`). Without them `npm run dev` prints each message to the terminal.
+
 ### `GET /api/health`
 
 `200 {"ok":true}`. No secrets, no upstream calls.
@@ -116,12 +120,15 @@ Steps are ordered so the cheapest checks run first and requests are stopped befo
 apps/api/
 ├─ functions/
 │  ├─ chat.ts        Vercel entry: wires real dependencies into handleChat
+│  ├─ contact.ts     Vercel entry for the contact form
 │  └─ health.ts
 ├─ scripts/build.mjs Bundles each function into one file and writes Vercel's output format
 ├─ public/           Placeholder page for the API's root address
 ├─ vercel.json       Build command
 ├─ src/
 │  ├─ chat.ts        handleChat(request, deps): the whole flow, pure and testable
+│  ├─ contact.ts     handleContact(request, deps): validation, spam checks, email and phone alert
+│  ├─ contactDeps.ts Contact settings, the SMTP mailer, the Telegram notifier, composition root
 │  ├─ config.ts      loadConfig(env): parses and validates settings
 │  ├─ http.ts        JSON errors, CORS headers, SSE encoding, client IP
 │  ├─ node.ts        Adapts handleChat (Request to Response) to Node's req and res; shared by Vercel and the dev server
