@@ -41,6 +41,9 @@ const TEXT_ON_BACKGROUND: [string, string][] = [
   ["ink", "hover"],
   ["accent", "side"],
   ["ai", "ai-soft"], // Ask AI accents
+  ["ai", "bg"], // the sparkle and loading dots
+  ["ai-ink", "ai"], // text on the AI send button and the visitor bubble
+  ["ai-deep-ink", "ai-deep"], // the chat header band
   ["ink", "callout"], // relocation callout
   ["ink", "accent-soft"],
 ];

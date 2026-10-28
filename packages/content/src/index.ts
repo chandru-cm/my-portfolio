@@ -5,5 +5,6 @@ export { skills, projectCount, LEVEL_LABEL } from "./skills";
 export { projects } from "./projects";
 export { caseStudies } from "./caseStudies";
 export { faq } from "./faq";
+export { suggestionPool, type Suggestion } from "./suggestions";
 export { toKnowledgeDocuments } from "./knowledge";
 export { toResume, type Resume } from "./resume";
