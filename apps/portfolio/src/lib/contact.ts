@@ -96,21 +96,51 @@ export function toPayload(d: ContactDraft, trap: string, elapsedMs: number): Con
   };
 }
 
-export type SendResult = { ok: true } | { ok: false; message: string; fallback: boolean };
+/** What happened to the receipt email: sent, failed (the message still reached the owner), or switched off. */
+export type Receipt = "sent" | "failed" | "off";
+
+/** `receipt` says whether the confirmation email to the visitor went out, so the screen never claims more than is true. */
+export type SendResult = { ok: true; receipt: Receipt } | { ok: false; message: string; fallback: boolean; timedOut?: boolean };
+
+/** The server answers within 30 seconds (its limit on Vercel). Waiting longer than this means something is wrong. */
+export const SEND_TIMEOUT_MS = 28_000;
 
 /** Posts the form. Every failure becomes a sentence a visitor can act on; `fallback` means "show the email address". */
-export async function sendContact(endpoint: string, payload: ContactPayload, fetchImpl: typeof fetch = fetch): Promise<SendResult> {
+export async function sendContact(
+  endpoint: string,
+  payload: ContactPayload,
+  fetchImpl: typeof fetch = fetch,
+  timeoutMs: number = SEND_TIMEOUT_MS
+): Promise<SendResult> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
   let res: Response;
   try {
     res = await fetchImpl(endpoint, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
+      signal: controller.signal,
     });
-  } catch {
+  } catch (error) {
+    if ((error as { name?: string })?.name === "AbortError") {
+      // We cannot know whether it arrived, so say so and let the visitor decide.
+      return {
+        ok: false,
+        message: "This took too long, and I cannot tell whether your message was sent. Please check your email for a receipt before trying again, or email me directly.",
+        fallback: true,
+        timedOut: true,
+      };
+    }
     return { ok: false, message: "I could not reach the server. Please email me directly.", fallback: true };
+  } finally {
+    clearTimeout(timer);
   }
-  if (res.ok) return { ok: true };
+  if (res.ok) {
+    const body = (await res.json().catch(() => ({}))) as { receipt?: unknown };
+    const receipt: Receipt = body.receipt === "sent" || body.receipt === "failed" ? body.receipt : "off";
+    return { ok: true, receipt };
+  }
 
   let message = "";
   try {

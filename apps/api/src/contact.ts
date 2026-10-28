@@ -151,6 +151,9 @@ export function parseContact(text: string): Parsed {
   return { ok: true, request: { kind, name, email, topic, message, channel, phone, preferred } };
 }
 
+/** What happened to the visitor's receipt email: sent, failed (their message still reached the owner), or switched off. */
+export type Receipt = "sent" | "failed" | "off";
+
 export const CHANNEL_LABEL: Record<ContactChannel, string> = { email: "Email", whatsapp: "WhatsApp", phone: "Phone call" };
 
 const when = (p: NonNullable<ContactRequest["preferred"]>) =>
@@ -273,8 +276,8 @@ async function run(
   const parsed = parseContact(text);
   if (parsed.ok === false) return finish(jsonError(400, "invalid_request", parsed.message, cors), undefined, "invalid");
 
-  const okBody = (delivered: string[]) =>
-    new Response(JSON.stringify({ ok: true, delivered }), {
+  const okBody = (delivered: string[], receipt?: Receipt) =>
+    new Response(JSON.stringify({ ok: true, delivered, ...(receipt ? { receipt } : {}) }), {
       status: 200,
       headers: { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store", ...cors },
     });
@@ -308,9 +311,14 @@ async function run(
     );
   }
 
+  let receipt: Receipt = "off";
   if (config.sendConfirmation && deps.mailer) {
     // Best effort: the owner already has the message, so a failed receipt must not fail the request.
-    await deps.mailer.send(confirmationMail(req, config.siteUrl)).catch((error) => failed.push(failureCode("receipt", error)));
+    receipt = "sent";
+    await deps.mailer.send(confirmationMail(req, config.siteUrl)).catch((error) => {
+      receipt = "failed";
+      failed.push(failureCode("receipt", error));
+    });
   }
-  return finish(okBody(delivered), req.kind, undefined, delivered, failed);
+  return finish(okBody(delivered, receipt), req.kind, undefined, delivered, failed);
 }
