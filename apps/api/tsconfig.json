@@ -5,5 +5,5 @@
     "target": "ES2022",
     "lib": ["ES2022", "DOM", "DOM.Iterable"]
   },
-  "include": ["src", "functions", "dev-server.ts"]
+  "include": ["src", "functions", "scripts/mail-preview.ts", "dev-server.ts"]
 }

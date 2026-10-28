@@ -13,7 +13,7 @@ import { fileURLToPath } from "node:url";
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const out = join(root, ".vercel", "output");
 
-const FUNCTIONS = { chat: "functions/chat.ts", health: "functions/health.ts" };
+const FUNCTIONS = { chat: "functions/chat.ts", contact: "functions/contact.ts", health: "functions/health.ts" };
 // Slow free-tier model answers need room: embedding, search and up to two model attempts.
 const MAX_DURATION_SECONDS = 30;
 const RUNTIME = "nodejs22.x";

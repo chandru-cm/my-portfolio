@@ -333,6 +333,61 @@ td.num, span.num, li > .num { font-family: var(--mono); font-size: 13px; font-va
 .chat-foot { padding: 0 14px 10px; font-size: 11.5px; line-height: 1.45; color: var(--muted); }
 
 
+/* Contact form */
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes draw { to { stroke-dashoffset: 0; } }
+@keyframes shake { 0%, 100% { transform: none; } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+.contact-grid-form { align-items: start; }
+.contact-grid-form > :nth-child(1) { grid-column: 1; grid-row: 1; }
+.contact-grid-form > :nth-child(2) { grid-column: 1; grid-row: 2; }
+.contact-grid-form > .contact-form { grid-column: 2; grid-row: 1 / span 2; min-width: 0; }
+.cform { border: 1px solid var(--line); border-radius: 12px; background: var(--surface); padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+.cform-kind { border: 1px solid var(--line); border-radius: 8px; padding: 2px; gap: 2px; }
+.cform-kind button { flex: 1; justify-content: center; }
+.cform-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.cform-row-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.field { display: flex; flex-direction: column; gap: 6px; border: 0; padding: 0; min-width: 0; }
+.field label, .field legend { font-family: var(--mono); font-size: 11.5px; letter-spacing: 0.04em; color: var(--muted); padding: 0; }
+.field input, .field select, .field textarea { width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line-2); border-radius: 8px; background: var(--bg); color: var(--ink); font: inherit; font-size: 14.5px; }
+.field textarea { resize: vertical; min-height: 110px; line-height: 1.55; }
+.field input:focus-visible, .field select:focus-visible, .field textarea:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.cform-topics .seg { gap: 6px; }
+.cform-topics .seg button { min-height: 36px; border: 1px solid var(--line); font-size: 13px; }
+.cform-topics .seg button[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
+.cform-phone { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px; }
+.cp { position: relative; }
+.cp-btn { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; height: 100%; padding: 0 10px 0 12px; border: 1px solid var(--line-2); border-radius: 8px; background: var(--bg); color: var(--ink); font: inherit; font-size: 14.5px; white-space: nowrap; cursor: pointer; transition: border-color 0.15s; }
+.cp-btn:hover { border-color: var(--muted); }
+.cp-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.cp-btn[aria-expanded="true"] { border-color: var(--accent); }
+.cp-iso { font-family: var(--mono); font-size: 11px; letter-spacing: 0.04em; color: var(--muted); }
+.cp-caret { color: var(--muted); font-size: 11px; margin-left: 2px; }
+.cp-pop { position: absolute; z-index: 30; top: calc(100% + 6px); left: 0; width: min(320px, calc(100vw - 48px)); background: var(--surface); border: 1px solid var(--line-2); border-radius: 12px; box-shadow: 0 12px 32px rgb(15 15 15 / 0.16); overflow: hidden; animation: up 0.18s var(--ease) both; }
+.cp-search { display: block; width: 100%; min-height: 46px; padding: 0 14px; border: 0; border-bottom: 1px solid var(--line); background: transparent; color: var(--ink); font: inherit; font-size: 14.5px; }
+.cp-search:focus { outline: none; }
+.cp-search::placeholder { color: var(--muted); }
+.cp-list { max-height: 264px; overflow-y: auto; padding: 4px; overscroll-behavior: contain; }
+.cp-head { padding: 10px 10px 4px; font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.cp-opt { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 8px; font-size: 14px; cursor: pointer; }
+.cp-opt[data-active="true"] { background: var(--hover); }
+.cp-opt[aria-selected="true"] { color: var(--accent); }
+.cp-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cp-dial { font-family: var(--mono); font-size: 12.5px; color: var(--muted); }
+.cp-tick { color: var(--accent); width: 14px; text-align: right; }
+.cp-empty { padding: 14px 10px; font-size: 14px; color: var(--muted); }
+.cform-hint { font-size: 12px; color: var(--muted); }
+.cform-trap { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+.cform-error { margin: 0; font-size: 13.5px; color: var(--danger); animation: shake 0.35s; }
+.cform-send { width: 100%; }
+.cform-send:disabled { opacity: 0.75; cursor: progress; }
+.cform-note { margin: 0; font-size: 12px; color: var(--muted); }
+.spin { width: 14px; height: 14px; border-radius: 50%; border: 2px solid currentColor; border-right-color: transparent; animation: spin 0.7s linear infinite; }
+.cform-done { align-items: center; text-align: center; padding: 36px 20px; }
+.cform-done h3 { font-size: 20px; }
+.cform-done p { color: var(--muted); max-width: 36ch; }
+.cform-check { display: grid; place-items: center; width: 56px; height: 56px; border-radius: 50%; background: var(--ok-soft); color: var(--ok); }
+.cform-check path { stroke-dasharray: 24; stroke-dashoffset: 24; animation: draw 0.5s 0.15s ease-out forwards; }
+
 /* Tablet */
 @media (max-width: 860px) {
   .facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -342,6 +397,7 @@ td.num, span.num, li > .num { font-family: var(--mono); font-size: 13px; font-va
   .cs-body { grid-template-columns: 1fr; gap: 24px; }
   .toc { display: none; }
   .contact-grid { grid-template-columns: 1fr; }
+  .contact-grid-form > :nth-child(n), .contact-grid-form > .contact-form { grid-column: auto; grid-row: auto; }
   .xp { grid-template-columns: 1fr; gap: 4px; }
 }
 
@@ -375,6 +431,7 @@ td.num, span.num, li > .num { font-family: var(--mono); font-size: 13px; font-va
   .chat-launcher-short { display: inline; }
   .chat-panel { right: 8px; left: 8px; bottom: 8px; width: auto; height: min(82dvh, 640px); }
   .msg { max-width: 94%; }
+  .cform-row, .cform-row-3 { grid-template-columns: 1fr; }
 }
 
 @media (prefers-reduced-motion: reduce) {

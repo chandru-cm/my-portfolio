@@ -6,5 +6,6 @@ export { projects } from "./projects";
 export { caseStudies } from "./caseStudies";
 export { faq } from "./faq";
 export { suggestionPool, type Suggestion } from "./suggestions";
+export { countries, guessCountry, normalizePhone, regionFromLocale, searchCountries, suggestedCountries, FALLBACK_COUNTRY, type Country, type NormalizedPhone, type PhoneInput, type PhoneResult } from "./phone";
 export { toKnowledgeDocuments } from "./knowledge";
 export { toResume, type Resume } from "./resume";
