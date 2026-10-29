@@ -1,6 +1,5 @@
 import { profile } from "@my-portfolio/content";
 import ContactForm from "./ContactForm";
-import CopyEmail from "./CopyEmail";
 import Cta from "./Cta";
 import Reveal from "./Reveal";
 import TimeZoneFit from "./TimeZoneFit";
@@ -26,17 +25,9 @@ export default function Contact() {
             </p>
           </div>
           <div>
-            <div className="mail">
-              <span>
-                {profile.email.split("@")[0]}
-                <span className="at">@</span>
-                {profile.email.split("@")[1]}
-              </span>
-              <CopyEmail email={profile.email} />
-            </div>
             <div className="links">
-              <Cta kind="mail" email={profile.email} variant="primary">
-                Email me
+              <Cta kind="mail" email={profile.email} variant="primary" icon="mail">
+                Mail me
               </Cta>
               {HAS_RESUME && (
                 <Cta
@@ -51,6 +42,7 @@ export default function Contact() {
                 kind="external"
                 href={profile.linkedin}
                 label={`${profile.name} on LinkedIn`}
+                icon="linkedin"
               >
                 LinkedIn
               </Cta>
@@ -58,6 +50,7 @@ export default function Contact() {
                 kind="external"
                 href={profile.github}
                 label={`${profile.name} on GitHub`}
+                icon="github"
               >
                 GitHub
               </Cta>

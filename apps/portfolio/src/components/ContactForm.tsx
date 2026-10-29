@@ -303,7 +303,7 @@ export default function ContactForm() {
           {fallback && (
             <>
               {" "}
-              <Cta kind="mail" email={profile.email} variant="link">
+              <Cta kind="mail" email={profile.email} variant="link" hint={false}>
                 Email me instead
               </Cta>
             </>

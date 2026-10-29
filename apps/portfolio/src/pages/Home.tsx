@@ -10,11 +10,10 @@ import {
   skills,
   type Category,
 } from "@my-portfolio/content";
-import CopyEmail from "../components/CopyEmail";
 import Cta from "../components/Cta";
 import ProjectCard from "../components/ProjectCard";
 import Reveal from "../components/Reveal";
-import { HAS_RESUME, RESUME_URL, formatMonth, yearsSince } from "../lib/site";
+import { HAS_RESUME, RESUME_URL, formatMonth } from "../lib/site";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
 
 type Filter = "All" | Category;
@@ -22,87 +21,60 @@ type View = "cards" | "table";
 const FILTERS: Filter[] = ["All", "Backend", "Mobile", "AI"];
 
 function Intro() {
-  const since = experience[0]?.start;
-  const years = since ? yearsSince(since) : 0;
   const { availability: a } = profile;
-  const facts: [string, string][] = [
-    [
-      "Experience",
-      since
-        ? `${years > 0 ? `${years} years, since` : "Since"} ${formatMonth(since)}`
-        : "",
-    ],
-    ["Based in", `${profile.location} · ${profile.timezone}`],
-    ["Looking for", a.lookingFor],
-    ["Work setup", a.workSetup],
-  ];
+  const availability = [
+    a.relocation ? "Open to roles in the US and EU." : "",
+    a.visaSponsorship ? "I need visa sponsorship." : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
   return (
     <section className="intro" id="top">
       <div className="wrap">
         <h1 className="in">{profile.name}</h1>
         <p className="role in">{profile.headline}</p>
         <p className="sum in d1">{profile.summary}</p>
-        <dl className="facts in d2">
-          {facts
-            .filter(([, v]) => v)
-            .map(([k, v]) => (
-              <div key={k}>
-                <dt>{k}</dt>
-                <dd>{v}</dd>
-              </div>
-            ))}
-        </dl>
-        {a.relocation && (
-          <div className="callout in d3" role="note">
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-            >
-              <path d="M20 6 9 17l-5-5" />
-            </svg>
-            <p>
-              <b>Open to relocation</b> abroad.
-              {a.visaSponsorship ? " I will need visa sponsorship." : ""}
-            </p>
-          </div>
-        )}
-        <div className="ctas in d4">
-          <Cta kind="section" to="projects" variant="primary">
-            See projects{" "}
+        {availability && <p className="avail in d2">{availability}</p>}
+        <div className="ctas in d3">
+          <Cta kind="section" to="contact" variant="primary" focusForm>
+            Get in touch{" "}
             <span className="arrow" aria-hidden="true">
-              →
+              ↓
             </span>
           </Cta>
-          {HAS_RESUME && (
+          <Cta kind="section" to="projects">
+            See selected work
+          </Cta>
+          <div className="ctas-links">
+            {HAS_RESUME && (
+              <Cta
+                kind="download"
+                href={RESUME_URL}
+                fileName="Chandra_Moorthy_Resume.pdf"
+                variant="link"
+              >
+                Resume
+              </Cta>
+            )}
             <Cta
-              kind="download"
-              href={RESUME_URL}
-              fileName="Chandra_Moorthy_Resume.pdf"
+              kind="external"
+              href={profile.github}
+              label={`${profile.name} on GitHub`}
+              variant="link"
+              icon="github"
             >
-              Resume (PDF)
+              GitHub
             </Cta>
-          )}
-          <Cta
-            kind="external"
-            href={profile.github}
-            label={`${profile.name} on GitHub`}
-          >
-            GitHub
-          </Cta>
-          <Cta
-            kind="external"
-            href={profile.linkedin}
-            label={`${profile.name} on LinkedIn`}
-          >
-            LinkedIn
-          </Cta>
+            <Cta
+              kind="external"
+              href={profile.linkedin}
+              label={`${profile.name} on LinkedIn`}
+              variant="link"
+              icon="linkedin"
+            >
+              LinkedIn
+            </Cta>
+          </div>
         </div>
       </div>
     </section>
