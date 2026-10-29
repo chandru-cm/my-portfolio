@@ -3,7 +3,6 @@ import { Link, useParams } from "react-router-dom";
 import { projects } from "@my-portfolio/content";
 import Carousel from "../components/Carousel";
 import Cta from "../components/Cta";
-import FlowDiagram from "../components/FlowDiagram";
 import { caseStudyFor, hostOf } from "../lib/site";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import NotFound from "./NotFound";
@@ -146,7 +145,6 @@ export default function Project() {
         label: study.title,
         body: (
           <>
-            {!study.approved && <p className="draft">Draft: visible in development only</p>}
             <p>{study.problem}</p>
             <ul className="bul">
               {study.built.map((b) => (
@@ -158,7 +156,6 @@ export default function Project() {
                 <li key={d}>{d}</li>
               ))}
             </ul>
-            <FlowDiagram steps={study.flow} />
           </>
         ),
       });

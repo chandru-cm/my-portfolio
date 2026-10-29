@@ -3,7 +3,7 @@ import type { Profile } from "./types";
 // Phone number is intentionally not part of the public content.
 export const profile: Profile = {
   name: "Chandra Moorthy",
-  headline: "Full-stack developer · Node.js, TypeScript, React Native",
+  headline: "Backend and full-stack engineer · Node.js, TypeScript, React Native",
   location: "Chennai, India",
   // Assembled at run time so the address is not a literal in the site code, which keeps simple
   // email scrapers from reading it out of the page source or the JavaScript bundle.
@@ -11,7 +11,7 @@ export const profile: Profile = {
   linkedin: "https://www.linkedin.com/in/chandra-moorthy-5a3156193",
   github: "https://github.com/chandru-cm",
   summary:
-    "I build multi-tenant SaaS products end to end: Node.js APIs on PostgreSQL or Firestore, React Native and Flutter apps, payments with Razorpay and AI features with Google Gemini. Four products I worked on are live in production.",
+    "I build multi-tenant SaaS products end to end: Node.js APIs, mobile apps, payments with Razorpay and AI features with Google Gemini. Four products I worked on are live in production.",
   availability: {
     relocation: true,
     visaSponsorship: true,
